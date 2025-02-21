@@ -1,59 +1,63 @@
-// src/components/Navbar.jsx
+import React from 'react';
 import { Link } from 'react-router-dom';
-import { useAuth } from '../hooks/useAuth';
+import { BookOpen, Trophy, User, LogOut } from 'lucide-react';
+import {useAuth} from '../hooks/useAuth'; //
+// import { useAuth } from '../context/AuthContext
+import './navbar.css';
 
-function Navbar() {
-  const { user, isAuthenticated, logout } = useAuth();
+const Navbar = () => {
+  const { user, signOut } = useAuth();
 
   return (
     <nav className="navbar">
-      <div className="navbar-left">
-        <Link to="/" className="logo">
-          Createathon
+      <div className="navbar-inner">
+        <Link to="/" className="logo-group">
+          <BookOpen className="logo-icon" />
+          <span className="logo-text">LearnHub</span>
         </Link>
+        
         <div className="nav-links">
-          <Link to="/challenges">Challenges</Link>
-          <Link to="/leaderboard">Leaderboard</Link>
-        </div>
-      </div>
-      <div className="navbar-right">
-        {isAuthenticated ? (
-          <>
-            <div className="user-info">
-              <span className="points-badge">{user.points} pts</span>
-              <Link to="/profile" className="profile-link">
-                <div className="avatar">
-                  {user.username.charAt(0).toUpperCase()}
-                </div>
-                <span className="username">{user.username}</span>
+          <Link to="/challenges" className="nav-link">
+            <span>Challenges</span>
+          </Link>
+          <Link to="/leaderboard" className="nav-link">
+            <Trophy className="icon" />
+            <span>Leaderboard</span>
+          </Link>
+          {user ? (
+            <div className="user-section">
+              <Link to="/profile" className="user-profile">
+                <User className="user-icon" />
+                <span className="user-email">{user.email}</span>
+              </Link>
+              <button
+                onClick={signOut}
+                className="sign-out-btn"
+              >
+                <LogOut className="icon" />
+                <span>Sign Out</span>
+              </button>
+            </div>
+          ) : (
+            <div className="auth-buttons">
+              <Link
+                to="/login"
+                className="sign-in-btn"
+              >
+                Sign In
+              </Link>
+              <Link
+                to="/register"
+                className="sign-up-btn"
+              >
+                Sign Up
               </Link>
             </div>
-            <div className="dropdown">
-              <button className="dropdown-toggle">
-                <i className="icon-menu"></i>
-              </button>
-              <div className="dropdown-menu">
-                <Link to="/dashboard">Dashboard</Link>
-                <Link to="/profile">Profile</Link>
-                <button onClick={logout} className="logout-btn">
-                  Log Out
-                </button>
-              </div>
-            </div>
-          </>
-        ) : (
-          <div className="auth-buttons">
-            <Link to="/login" className="btn-secondary">
-              Log In
-            </Link>
-            <Link to="/register" className="btn-primary">
-              Sign Up
-            </Link>
-          </div>
-        )}
+          )}
+        </div>
       </div>
     </nav>
   );
-}
+};
 
 export default Navbar;

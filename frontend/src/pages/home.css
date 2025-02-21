@@ -10,7 +10,6 @@
   padding: 0 2rem;
 }
 
-
 /* Section styles */
 .home-section {
   text-align: center;
@@ -61,26 +60,20 @@
   min-width: 200px;
 }
 
-
 .home-link:hover {
   background-color: #3730a3;
   transform: translateY(-2px);
   box-shadow: 0 10px 15px -3px rgba(79, 70, 229, 0.1), 0 4px 6px -2px rgba(79, 70, 229, 0.05);
 }
 
-
 /* Grid cards */
 .home-grid {
   display: grid;
   gap: 2rem;
-  /* margin-top: 2rem; */
   width: 100%;
   justify-content: space-between;
   padding: 0 1rem;
 }
-
-
-
 
 @media (min-width: 768px) {
   .home-grid {
@@ -102,13 +95,10 @@
   box-sizing: border-box;
 }
 
-
 .home-card:hover {
   transform: translateY(-5px);
   box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
 }
-
-
 
 .home-card:hover {
   transform: scale(1.05);
@@ -122,7 +112,6 @@
   border-radius: 1rem;
   animation: bounceSlow 2s infinite;
 }
-
 
 .home-card-title {
   font-size: 1.25rem;
@@ -145,7 +134,6 @@
   width: 100%;
 }
 
-
 .featured-title {
   font-size: 1.875rem;
   font-weight: 700;
@@ -162,10 +150,6 @@
   padding: 0 1rem;
   margin-top: 2rem;
 }
-
-
-
-
 
 @media (min-width: 768px) {
   .featured-grid {
@@ -185,14 +169,11 @@
   box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
 }
 
-
 .featured-card:hover {
   transform: translateY(-3px);
   box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
   border-color: rgba(79, 70, 229, 0.2);
 }
-
-
 
 .featured-card:hover {
   border-color: #4f46e5;
@@ -202,11 +183,8 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 1.5rem;
-  padding-bottom: 1rem;
   border-bottom: 1px solid rgba(0, 0, 0, 0.05);
 }
-
 
 .featured-card-title {
   font-size: 1.25rem;
@@ -250,7 +228,6 @@
   font-weight: 500;
   text-decoration: none;
   display: flex;
-  align-items: center;
   transition: color 0.2s;
 }
 
@@ -264,6 +241,14 @@
 
 .featured-link:hover svg {
   transform: translateX(0.25rem);
+}
+
+/* Featured card footer */
+.featured-card-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 1rem;
 }
 
 /* Animations */

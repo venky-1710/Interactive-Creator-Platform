@@ -1,37 +1,114 @@
-// src/components/Footer.jsx
+import React from 'react';
 import { Link } from 'react-router-dom';
+import { BookOpen, Github, Twitter, Linkedin, Mail } from 'lucide-react';
+import './Footer.css';
 
-function Footer() {
+const Footer = () => {
   return (
     <footer className="footer">
-      <div className="footer-content">
-        <div className="footer-section">
-          <h3>Createathon</h3>
-          <p>An interactive learning platform for coding challenges and knowledge quests.</p>
+      <div className="footer-container">
+        <div className="footer-grid">
+          <div className="space-y-4">
+            <Link to="/" className="footer-brand">
+              <BookOpen className="h-8 w-8 text-indigo-600" />
+              <span className="footer-brand-text">LearnHub</span>
+            </Link>
+            <p className="footer-description">
+              Empowering developers through interactive learning and community engagement.
+            </p>
+            <div className="footer-social">
+              <a href="#" className="footer-social-link">
+                <Github className="h-5 w-5" />
+              </a>
+              <a href="#" className="footer-social-link">
+                <Twitter className="h-5 w-5" />
+              </a>
+              <a href="#" className="footer-social-link">
+                <Linkedin className="h-5 w-5" />
+              </a>
+            </div>
+          </div>
+
+          <div>
+            <h3 className="footer-section-title">Learn</h3>
+            <ul className="footer-links">
+              <li>
+                <Link to="/challenges" className="footer-link">
+                  Challenges
+                </Link>
+              </li>
+              <li>
+                <Link to="/tutorials" className="footer-link">
+                  Tutorials
+                </Link>
+              </li>
+              <li>
+                <Link to="/resources" className="footer-link">
+                  Resources
+                </Link>
+              </li>
+            </ul>
+          </div>
+
+          <div>
+            <h3 className="footer-section-title">Community</h3>
+            <ul className="footer-links">
+              <li>
+                <Link to="/leaderboard" className="footer-link">
+                  Leaderboard
+                </Link>
+              </li>
+              <li>
+                <Link to="/discussions" className="footer-link">
+                  Discussions
+                </Link>
+              </li>
+              <li>
+                <Link to="/blog" className="footer-link">
+                  Blog
+                </Link>
+              </li>
+            </ul>
+          </div>
+
+          <div>
+            <h3 className="footer-section-title">Newsletter</h3>
+            <p className="footer-newsletter">
+              Stay updated with the latest challenges and community news.
+            </p>
+            <form className="space-y-2">
+              <input
+                type="email"
+                placeholder="Enter your email"
+                className="footer-input"
+              />
+              <button
+                type="submit"
+                className="footer-button"
+              >
+                Subscribe
+              </button>
+            </form>
+          </div>
         </div>
-        <div className="footer-section">
-          <h3>Quick Links</h3>
-          <ul>
-            <li><Link to="/challenges">Challenges</Link></li>
-            <li><Link to="/leaderboard">Leaderboard</Link></li>
-            <li><Link to="/login">Login</Link></li>
-            <li><Link to="/register">Register</Link></li>
-          </ul>
+
+        <div className="footer-bottom">
+          <p className="footer-copyright">© 2024 LearnHub. All rights reserved.</p>
+          <div className="footer-legal-links">
+            <Link to="/privacy" className="footer-link">
+              Privacy Policy
+            </Link>
+            <Link to="/terms" className="footer-link">
+              Terms of Service
+            </Link>
+            <Link to="/contact" className="footer-link">
+              Contact Us
+            </Link>
+          </div>
         </div>
-        <div className="footer-section">
-          <h3>Connect</h3>
-          <ul className="social-links">
-            <li><a href="#" target="_blank" rel="noopener noreferrer">Twitter</a></li>
-            <li><a href="#" target="_blank" rel="noopener noreferrer">GitHub</a></li>
-            <li><a href="#" target="_blank" rel="noopener noreferrer">Discord</a></li>
-          </ul>
-        </div>
-      </div>
-      <div className="footer-bottom">
-        <p>&copy; {new Date().getFullYear()} Createathon. All rights reserved.</p>
       </div>
     </footer>
   );
-}
+};
 
 export default Footer;

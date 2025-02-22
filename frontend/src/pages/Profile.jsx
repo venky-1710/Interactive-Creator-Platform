@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react';
 import { useAuth } from '../hooks/useAuth';
 import { getUserSubmissions } from '../services/challengeService';
 import ProfileTabs from '../components/ProfileTabs';
+import './Profile.css';
 
 function Profile() {
   const { user, updateUser } = useAuth();
@@ -114,6 +115,14 @@ function Profile() {
           <div className="info-row">
             <strong>Account Created:</strong>
             <span>{new Date(user.created_at).toLocaleDateString()}</span>
+          </div>
+          <div className="info-row">
+            <strong>Points:</strong>
+            <span>{user.points}</span>
+          </div>
+          <div className="info-row">
+            <strong>Completed Challenges:</strong>
+            <span>{user.completed_challenges.length}</span>
           </div>
           <button 
             className="btn-primary"

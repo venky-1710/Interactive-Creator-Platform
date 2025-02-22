@@ -1,0 +1,51 @@
+/* src/components/ProfileTabs.css */
+
+.profile-tabs {
+    margin-bottom: 2rem;
+  }
+  
+  .tab-buttons {
+    display: flex;
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+    border-bottom: 1px solid #e0e0e0;
+  }
+  
+  .tab-buttons button {
+    padding: 1rem 1.5rem;
+    cursor: pointer;
+    font-weight: bold;
+    color: #666;
+    background: none;
+    border: none;
+    transition: all 0.3s ease;
+    font-size: 1rem;
+  }
+  
+  .tab-buttons button:hover {
+    color: #1890ff;
+  }
+  
+  .tab-buttons button.active {
+    color: #1890ff;
+    border-bottom: 2px solid #1890ff;
+  }
+  
+  .tab-content {
+    padding: 2rem 0;
+  }
+  
+  /* Responsive design */
+  @media (max-width: 768px) {
+    .tab-buttons {
+      flex-wrap: wrap;
+    }
+  
+    .tab-buttons button {
+      flex: 1 1 auto;
+      text-align: center;
+      padding: 0.75rem 1rem;
+    }
+  }
+  

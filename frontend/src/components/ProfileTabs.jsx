@@ -1,25 +1,34 @@
 // src/components/ProfileTabs.jsx
 import { useState } from 'react';
+import './ProfileTabs.css'; // Add this line to import the CSS
 
-function ProfileTabs({ children, defaultTab }) {
-  const [activeTab, setActiveTab] = useState(defaultTab || 0);
+function ProfileTabs({ children }) {
+  const [activeTab, setActiveTab] = useState(children[0].props.label);
 
-  // Expects children to be an array of { title, content } objects
+  const handleTabClick = (label) => {
+    setActiveTab(label);
+  };
+
   return (
     <div className="profile-tabs">
-      <div className="tabs-header">
-        {children.map((tab, index) => (
+      <div className="tab-buttons">
+        {children.map((child) => (
           <button
-            key={index}
-            className={`tab-button ${activeTab === index ? 'active' : ''}`}
-            onClick={() => setActiveTab(index)}
+            key={child.props.label}
+            className={child.props.label === activeTab ? 'active' : ''}
+            onClick={() => handleTabClick(child.props.label)}
           >
-            {tab.title}
+            {child.props.label}
           </button>
         ))}
       </div>
       <div className="tab-content">
-        {children[activeTab].content}
+        {children.map((child) => {
+          if (child.props.label === activeTab) {
+            return <div key={child.props.label}>{child.props.children}</div>;
+          }
+          return null;
+        })}
       </div>
     </div>
   );

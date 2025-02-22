@@ -20,6 +20,11 @@ function ChallengeDetails() {
   const [result, setResult] = useState(null);
 
   useEffect(() => {
+    if (!isAuthenticated) {
+      navigate('/login');
+      return;
+    }
+
     const fetchChallenge = async () => {
       try {
         const data = await getChallengeById(id);
@@ -45,7 +50,7 @@ function ChallengeDetails() {
     };
 
     fetchChallenge();
-  }, [id]);
+  }, [id, isAuthenticated, navigate]);
 
   const handleSubmit = async () => {
     if (!isAuthenticated) {

@@ -2,7 +2,7 @@
 import { Routes, Route, Navigate } from 'react-router-dom';
 import { useAuth } from './hooks/useAuth';
 import Navbar from './components/Navbar';
-import Footer from './components/Footer';
+// import Footer from './components/Footer';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import Dashboard from './pages/Dashboard';
@@ -37,7 +37,7 @@ function App() {
           {/* <Route path="*" element={<NotFound />} /> */}
         </Routes>
       </main>
-      <Footer />
+      {/* Remove the Footer component here */}
     </div>
   );
 }

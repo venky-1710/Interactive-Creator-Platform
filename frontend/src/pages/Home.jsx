@@ -2,6 +2,7 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowRight, Code, Brain, Trophy } from 'lucide-react';
 import './home.css';
+import Footer from '../components/Footer';
 
 const Home = () => {
   return (
@@ -88,6 +89,7 @@ const Home = () => {
           ))}
         </div>
       </section>
+      <Footer />
     </div>
   );
 };

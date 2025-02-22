@@ -2,6 +2,8 @@
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
+import './Login.css';
+// import './Register.css'
 
 function Register() {
   const [formData, setFormData] = useState({
@@ -55,9 +57,9 @@ function Register() {
   };
 
   return (
-    <div className="register-container">
+    <div className="login-container">
       <div className="auth-form-wrapper">
-        <h1>Join Createathon</h1>
+        <h1>Join LearnHub</h1>
         <h2>Create your account</h2>
         
         {error && <div className="error-message">{error}</div>}

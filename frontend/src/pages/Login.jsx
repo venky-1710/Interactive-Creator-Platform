@@ -33,7 +33,7 @@ function Login() {
   return (
     <div className="login-container">
       <div className="auth-form-wrapper">
-        <h1>Welcome to Createathon</h1>
+        <h1>Welcome to LearnHub</h1>
         <h2>Log in to your account</h2>
         
         {error && <div className="error-message">{error}</div>}

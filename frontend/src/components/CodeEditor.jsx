@@ -2,7 +2,7 @@
 import { useEffect, useRef } from 'react';
 import * as monaco from 'monaco-editor';
 
-function CodeEditor({ code, onChange, language, disabled }) {
+function CodeEditor({ code, onChange, language, disabled, onRun }) {
   const editorRef = useRef(null);
   const containerRef = useRef(null);
 
@@ -42,12 +42,25 @@ function CodeEditor({ code, onChange, language, disabled }) {
     }
   }, [code]);
 
-  return (
-    <div 
-      ref={containerRef} 
-      className="code-editor-container" 
-      style={{ height: '500px', width: '100%', border: '1px solid #ccc' }}
-    />
+  const handleRun = () => {
+    onRun(code, language);
+  };
+
+  return ( 
+    <div>
+      <button 
+        className="btn-primary run-btn" 
+        onClick={handleRun} 
+        disabled={disabled}
+      >
+        Run Code
+      </button>
+      <div
+        ref={containerRef} 
+        className="code-editor-container" 
+        style={{ height: '500px', width: '100%', border: '1px solid #ccc', boxSizing: 'border-box' }}
+      />
+    </div>
   );
 }
 

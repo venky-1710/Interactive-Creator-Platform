@@ -1,0 +1,194 @@
+/* src/pages/ChallengeDetails.css */
+
+.challenge-details-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 2rem;
+  }
+  
+  .challenge-header {
+    margin-bottom: 2rem;
+  }
+  
+  .challenge-header h1 {
+    font-size: 2.5rem;
+    color: #333;
+    margin-bottom: 0.5rem;
+  }
+  
+  .challenge-meta {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+  }
+  
+  .difficulty {
+    font-weight: bold;
+    padding: 0.25rem 0.5rem;
+    border-radius: 4px;
+    font-size: 0.9rem;
+  }
+  
+  .difficulty.beginner { background-color: #e6f7ff; color: #0066cc; }
+  .difficulty.intermediate { background-color: #fff7e6; color: #ff9900; }
+  .difficulty.advanced { background-color: #fff1f0; color: #ff4d4f; }
+  
+  .category, .points {
+    font-size: 0.9rem;
+    color: #666;
+  }
+  
+  .challenge-content {
+    display: flex;
+    gap: 2rem;
+  }
+  
+  .description {
+    flex: 1;
+  }
+  
+  .description h2, .description h3 {
+    color: #333;
+    margin-bottom: 1rem;
+  }
+  
+  .markdown-content {
+    font-size: 1rem;
+    line-height: 1.6;
+    color: #333;
+  }
+  
+  .test-cases {
+    margin-top: 2rem;
+  }
+  
+  .test-cases-list {
+    background-color: #f5f5f5;
+    border-radius: 8px;
+    padding: 1rem;
+  }
+  
+  .test-case {
+    margin-bottom: 1rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid #e0e0e0;
+  }
+  
+  .test-case:last-child {
+    margin-bottom: 0;
+    padding-bottom: 0;
+    border-bottom: none;
+  }
+  
+  .code-section {
+    flex: 1;
+  }
+  
+  .language-selector {
+    margin-bottom: 1rem;
+  }
+  
+  .language-selector label {
+    margin-right: 0.5rem;
+    font-weight: bold;
+  }
+  
+  .language-selector select {
+    padding: 0.5rem;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 1rem;
+  }
+  
+  .submission-controls {
+    margin-top: 1rem;
+    display: flex;
+    gap: 1rem;
+  }
+  
+  .btn-primary, .btn-secondary {
+    padding: 0.5rem 1rem;
+    border: none;
+    border-radius: 4px;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: background-color 0.2s ease-in-out;
+  }
+  
+  .btn-primary {
+    background-color: #1890ff;
+    color: #fff;
+  }
+  
+  .btn-primary:hover {
+    background-color: #40a9ff;
+  }
+  
+  .btn-secondary {
+    background-color: #f5f5f5;
+    color: #333;
+  }
+  
+  .btn-secondary:hover {
+    background-color: #e0e0e0;
+  }
+  
+  .submission-result {
+    margin-top: 2rem;
+    padding: 1rem;
+    border-radius: 8px;
+  }
+  
+  .submission-result.success {
+    background-color: #f6ffed;
+    border: 1px solid #b7eb8f;
+  }
+  
+  .submission-result.failure {
+    background-color: #fff1f0;
+    border: 1px solid #ffa39e;
+  }
+  
+  .points-earned {
+    font-weight: bold;
+    color: #52c41a;
+  }
+  
+  .test-results ul {
+    list-style-type: none;
+    padding: 0;
+  }
+  
+  .test-results li {
+    margin-bottom: 0.5rem;
+  }
+  
+  .test-results li.passed {
+    color: #52c41a;
+  }
+  
+  .test-results li.failed {
+    color: #ff4d4f;
+  }
+  
+  .error-output {
+    background-color: #fff1f0;
+    border: 1px solid #ffa39e;
+    padding: 0.5rem;
+    margin-top: 0.5rem;
+    border-radius: 4px;
+    font-family: monospace;
+    font-size: 0.9rem;
+  }
+  
+  .loading, .error-message, .not-found {
+    text-align: center;
+    padding: 2rem;
+    font-size: 1.1rem;
+    color: #666;
+  }
+  
+  .error-message {
+    color: #ff4d4f;
+  }
+  

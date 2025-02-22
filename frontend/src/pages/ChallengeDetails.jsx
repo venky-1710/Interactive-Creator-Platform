@@ -4,6 +4,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
 import { getChallengeById, submitChallenge } from '../services/challengeService';
 import CodeEditor from '../components/CodeEditor';
+import './ChallengeDetails.css';
 
 function ChallengeDetails() {
   const { id } = useParams();

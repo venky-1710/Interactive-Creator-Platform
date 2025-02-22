@@ -1,12 +1,13 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { BookOpen, Trophy, User, LogOut } from 'lucide-react';
-import {useAuth} from '../hooks/useAuth'; //
-// import { useAuth } from '../context/AuthContext
+import { useAuth } from '../hooks/useAuth';
 import './navbar.css';
 
 const Navbar = () => {
-  const { user, signOut } = useAuth();
+  const { user, logout } = useAuth();
+
+  const navigate = useNavigate();
 
   return (
     <nav className="navbar">
@@ -31,7 +32,11 @@ const Navbar = () => {
                 <span className="user-email">{user.email}</span>
               </Link>
               <button
-                onClick={signOut}
+                onClick={() => {
+                  logout();
+
+                  navigate('/login');
+                }}
                 className="sign-out-btn"
               >
                 <LogOut className="icon" />
@@ -40,16 +45,10 @@ const Navbar = () => {
             </div>
           ) : (
             <div className="auth-buttons">
-              <Link
-                to="/login"
-                className="sign-in-btn"
-              >
+              <Link to="/login" className="sign-in-btn">
                 Sign In
               </Link>
-              <Link
-                to="/register"
-                className="sign-up-btn"
-              >
+              <Link to="/register" className="sign-up-btn">
                 Sign Up
               </Link>
             </div>

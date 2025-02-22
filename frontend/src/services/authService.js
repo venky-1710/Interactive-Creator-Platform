@@ -56,4 +56,6 @@ export const getCurrentUser = async () => {
 
 export const logoutUser = () => {
   // FastAPI uses token-based auth, so we just need to remove the token
+  localStorage.removeItem('token'); // Remove the token from local storage
+  // This function can be expanded to include server-side logout if needed
 };

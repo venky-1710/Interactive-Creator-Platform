@@ -4,6 +4,7 @@ import { Link } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
 import { getUserSubmissions } from '../services/challengeService';
 import { getChallengeById } from '../services/challengeService';
+import './Dashboard.css';
 
 function Dashboard() {
   const { user } = useAuth();

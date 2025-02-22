@@ -18,7 +18,13 @@ const Navbar = () => {
         </Link>
         
         <div className="nav-links">
+          {user && (
+            <Link to="/dashboard" className="nav-link">
+              <span>Dashboard</span>
+            </Link>
+          )}
           <Link to="/challenges" className="nav-link">
+
             <span>Challenges</span>
           </Link>
           <Link to="/leaderboard" className="nav-link">

@@ -2,6 +2,7 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { getAllChallenges } from '../services/challengeService';
+import './Challenges.css';
 
 function Challenges() {
   const [challenges, setChallenges] = useState([]);

@@ -1,0 +1,144 @@
+/* src/pages/Challenges.css */
+
+.challenges-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 2rem;
+  }
+  
+  .challenges-header {
+    text-align: center;
+    margin-bottom: 2rem;
+  }
+  
+  .challenges-header h1 {
+    font-size: 2.5rem;
+    color: #333;
+    margin-bottom: 0.5rem;
+  }
+  
+  .challenges-header p {
+    font-size: 1.1rem;
+    color: #666;
+  }
+  
+  .filters-section {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    margin-bottom: 2rem;
+  }
+  
+  .filter-group {
+    display: flex;
+    align-items: center;
+  }
+  
+  .filter-group label {
+    margin-right: 0.5rem;
+    font-weight: bold;
+  }
+  
+  .filter-group select {
+    padding: 0.5rem;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 1rem;
+  }
+  
+  .challenges-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 2rem;
+  }
+  
+  .challenge-card {
+    background-color: #fff;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    padding: 1.5rem;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    transition: transform 0.2s ease-in-out;
+  }
+  
+  .challenge-card:hover {
+    transform: translateY(-5px);
+  }
+  
+  .challenge-header {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 1rem;
+  }
+  
+  .difficulty {
+    font-weight: bold;
+    padding: 0.25rem 0.5rem;
+    border-radius: 4px;
+    font-size: 0.9rem;
+  }
+  
+  .difficulty.beginner { background-color: #e6f7ff; color: #0066cc; }
+  .difficulty.intermediate { background-color: #fff7e6; color: #ff9900; }
+  .difficulty.advanced { background-color: #fff1f0; color: #ff4d4f; }
+  
+  .category {
+    font-size: 0.9rem;
+    color: #666;
+  }
+  
+  .challenge-card h3 {
+    font-size: 1.2rem;
+    margin-bottom: 0.5rem;
+    color: #333;
+  }
+  
+  .challenge-card p {
+    font-size: 0.9rem;
+    color: #666;
+    margin-bottom: 1rem;
+  }
+  
+  .challenge-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  
+  .points {
+    font-size: 0.9rem;
+    color: #666;
+  }
+  
+  .icon-star {
+    color: #ffd700;
+    margin-right: 0.25rem;
+  }
+  
+  .btn-primary {
+    background-color: #1890ff;
+    color: #fff;
+    padding: 0.5rem 1rem;
+    border: none;
+    border-radius: 4px;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: background-color 0.2s ease-in-out;
+    text-decoration: none;
+  }
+  
+  .btn-primary:hover {
+    background-color: #40a9ff;
+  }
+  
+  .loading, .error-message, .empty-state {
+    text-align: center;
+    padding: 2rem;
+    font-size: 1.1rem;
+    color: #666;
+  }
+  
+  .error-message {
+    color: #ff4d4f;
+  }
+  

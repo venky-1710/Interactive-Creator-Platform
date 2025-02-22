@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { getLeaderboard } from '../services/leaderboardService';
 import { useAuth } from '../hooks/useAuth';
+import './Leaderboard.css';
 
 function Leaderboard() {
   const [leaderboard, setLeaderboard] = useState([]);

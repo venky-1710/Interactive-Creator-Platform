@@ -5,6 +5,8 @@ import { compileCode } from '../services/challengeService'; // Import the compil
 
 function CodeEditor({ code, onChange, language, disabled }) {
   const [output, setOutput] = useState('');
+  const [inputs, setInputs] = useState('');
+
   const editorRef = useRef(null);
   const containerRef = useRef(null);
 
@@ -46,7 +48,8 @@ function CodeEditor({ code, onChange, language, disabled }) {
 
   const handleRun = async () => {
     try {
-      const result = await compileCode(code, language);
+      const result = await compileCode(code, language, inputs);
+
       setOutput(result);
     } catch (error) {
       setOutput(`Error: ${error.message}`);
@@ -67,10 +70,35 @@ function CodeEditor({ code, onChange, language, disabled }) {
         className="code-editor-container" 
         style={{ height: '500px', width: '100%', border: '1px solid #ccc', boxSizing: 'border-box' }}
       />
+      <div className="input-container" style={{ margin: '10px 0' }}>
+        <h3>Input:</h3>
+        <textarea
+          value={inputs}
+          onChange={(e) => setInputs(e.target.value)}
+          style={{
+            width: '100%',
+            minHeight: '50px',
+            padding: '8px',
+            fontFamily: 'monospace',
+            backgroundColor: '#1e1e1e',
+            color: '#d4d4d4',
+            border: '1px solid #ccc'
+          }}
+          placeholder="Enter input values here (if needed)"
+        />
+      </div>
       <div className="output-container">
         <h3>Output:</h3>
-        <pre>{output}</pre>
+        <pre style={{
+          backgroundColor: '#1e1e1e',
+          color: '#d4d4d4',
+          fontFamily: 'monospace',
+          padding: '8px',
+          border: '1px solid #ccc',
+          minHeight: '50px'
+        }}>{output}</pre>
       </div>
+
     </div>
   );
 }

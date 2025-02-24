@@ -1,14 +1,19 @@
 // src/services/challengeService.js
 import api from './api';
 
-export const compileCode = async (code, language) => {
+export const compileCode = async (code, language, inputs = '') => {
   try {
-    const response = await api.post('/compile', { code, language });
+    const response = await api.post('/compile', { 
+      code, 
+      language, 
+      inputs 
+    });
     return response.data.output; // Assuming the response contains the output
   } catch (error) {
-    throw new Error('Compilation failed: ' + error.message);
+    throw new Error('Compilation failed: ' + (error.response?.data?.output || error.message));
   }
 };
+
 
 export const getAllChallenges = async (filters = {}) => {
 

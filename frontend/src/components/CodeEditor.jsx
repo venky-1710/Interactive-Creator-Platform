@@ -1,8 +1,10 @@
 // src/components/CodeEditor.jsx
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import * as monaco from 'monaco-editor';
+import { compileCode } from '../services/challengeService'; // Import the compileCode function
 
-function CodeEditor({ code, onChange, language, disabled, onRun }) {
+function CodeEditor({ code, onChange, language, disabled }) {
+  const [output, setOutput] = useState('');
   const editorRef = useRef(null);
   const containerRef = useRef(null);
 
@@ -42,13 +44,18 @@ function CodeEditor({ code, onChange, language, disabled, onRun }) {
     }
   }, [code]);
 
-  const handleRun = () => {
-    onRun(code, language);
+  const handleRun = async () => {
+    try {
+      const result = await compileCode(code, language);
+      setOutput(result);
+    } catch (error) {
+      setOutput(`Error: ${error.message}`);
+    }
   };
 
   return ( 
     <div>
-      <button 
+      <button
         className="btn-primary run-btn" 
         onClick={handleRun} 
         disabled={disabled}
@@ -60,6 +67,10 @@ function CodeEditor({ code, onChange, language, disabled, onRun }) {
         className="code-editor-container" 
         style={{ height: '500px', width: '100%', border: '1px solid #ccc', boxSizing: 'border-box' }}
       />
+      <div className="output-container">
+        <h3>Output:</h3>
+        <pre>{output}</pre>
+      </div>
     </div>
   );
 }

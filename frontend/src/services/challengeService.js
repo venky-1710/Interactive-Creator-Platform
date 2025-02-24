@@ -1,7 +1,17 @@
 // src/services/challengeService.js
 import api from './api';
 
+export const compileCode = async (code, language) => {
+  try {
+    const response = await api.post('/compile', { code, language });
+    return response.data.output; // Assuming the response contains the output
+  } catch (error) {
+    throw new Error('Compilation failed: ' + error.message);
+  }
+};
+
 export const getAllChallenges = async (filters = {}) => {
+
   try {
     const response = await api.get('/challenges', { params: filters });
     return response.data;
@@ -11,6 +21,7 @@ export const getAllChallenges = async (filters = {}) => {
 };
 
 export const getChallengeById = async (id) => {
+
   try {
     const response = await api.get(`/challenges/${id}`);
     return response.data;
@@ -20,6 +31,7 @@ export const getChallengeById = async (id) => {
 };
 
 export const submitChallenge = async (submissionData) => {
+
   try {
     const response = await api.post('/submissions/', submissionData);
     return response.data;
@@ -29,6 +41,7 @@ export const submitChallenge = async (submissionData) => {
 };
 
 export const getUserSubmissions = async () => {
+
   try {
     const response = await api.get('/submissions/');
     return response.data;

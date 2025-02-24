@@ -329,7 +329,61 @@ async def list_user_submissions(current_user: User = Depends(get_current_active_
 def read_root():
     return {"status": "online", "service": "Createathon API"}
 
+import subprocess
+import tempfile
+import os
+
+class CompileRequest(BaseModel):
+    code: str
+    language: str
+    inputs: Optional[str] = None
+
+@app.post("/compile")
+async def compile_code(request: CompileRequest):
+    """
+    Compiles and executes the provided code with optional inputs
+    """
+    try:
+        # Create a temporary file
+        with tempfile.NamedTemporaryFile(mode='w', delete=False) as temp:
+            temp.write(request.code)
+            temp_path = temp.name
+
+        # Determine the execution command based on language
+        if request.language == 'python':
+            cmd = ['python', temp_path]
+        elif request.language == 'javascript':
+            cmd = ['node', temp_path]
+        else:
+            raise ValueError(f"Unsupported language: {request.language}")
+
+        # Execute the code with optional inputs
+        process = subprocess.Popen(
+            cmd,
+            stdin=subprocess.PIPE,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            text=True
+        )
+        
+        # Provide inputs if available
+        stdout, stderr = process.communicate(input=request.inputs)
+
+        # Clean up the temporary file
+        os.unlink(temp_path)
+
+        # Return the output or error
+        if process.returncode == 0:
+            return {"output": stdout}
+        else:
+            return {"output": f"Error:\n{stderr}"}
+
+    except Exception as e:
+        return {"output": f"Compilation error: {str(e)}"}
+
+
 # Run with: uvicorn main:app --reload
+
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run(app, host="0.0.0.0", port=8000)

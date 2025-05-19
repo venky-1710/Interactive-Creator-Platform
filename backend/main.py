@@ -44,18 +44,21 @@ oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 # Pydantic models
 class PyObjectId(ObjectId):
     @classmethod
+    def __get_pydantic_json_schema__(cls, schema, field_schema):
+        field_schema.update(type='string')
+        return field_schema
+
+    @classmethod
     def __get_validators__(cls):
         yield cls.validate
 
     @classmethod
-    def validate(cls, v):
+    def validate(cls, v, handler):
+        if not v:
+            raise ValueError('Missing ObjectId')
         if not ObjectId.is_valid(v):
-            raise ValueError("Invalid objectid")
-        return ObjectId(v)
-
-    @classmethod
-    def __modify_schema__(cls, field_schema):
-        field_schema.update(type="string")
+            raise ValueError('Invalid ObjectId')
+        return str(v) if not isinstance(v, ObjectId) else str(v)
 
 class UserBase(BaseModel):
     username: str
@@ -70,15 +73,30 @@ class User(UserBase):
     created_at: datetime = Field(default_factory=datetime.utcnow)
     is_active: bool = True
     points: int = 0
-    completed_challenges: List[PyObjectId] = []
+    completed_challenges: List[PyObjectId] = Field(default_factory=list)
+    
+    model_config = {
+        "populate_by_name": True,
+        "arbitrary_types_allowed": True,
+        "json_encoders": {ObjectId: str},
+        "json_schema_extra": {
+            "example": {
+                "username": "johndoe",
+                "email": "john@example.com",
+                "full_name": "John Doe",
+                "points": 0,
+                "completed_challenges": []
+            }
+        }
+    }
+
+class UserInDB(User):  # Change to inherit from User instead of UserBase
+    hashed_password: str
 
     class Config:
-        allow_population_by_field_name = True
+        populate_by_name = True
         arbitrary_types_allowed = True
         json_encoders = {ObjectId: str}
-
-class UserInDB(User):
-    hashed_password: str
 
 class Token(BaseModel):
     access_token: str
@@ -102,7 +120,7 @@ class Challenge(ChallengeBase):
     created_by: Optional[PyObjectId] = None
 
     class Config:
-        allow_population_by_field_name = True
+        populate_by_name = True
         arbitrary_types_allowed = True
         json_encoders = {ObjectId: str}
 
@@ -121,7 +139,7 @@ class Submission(SubmissionBase):
     test_results: Optional[List[dict]] = []
 
     class Config:
-        allow_population_by_field_name = True
+        populate_by_name = True
         arbitrary_types_allowed = True
         json_encoders = {ObjectId: str}
 
@@ -133,16 +151,33 @@ def get_password_hash(password):
     return pwd_context.hash(password)
 
 async def get_user(username: str):
-    if (user := await db.users.find_one({"username": username})):
-        return UserInDB(**user)
+    try:
+        user_dict = await db.users.find_one({"username": username})
+        if user_dict:
+            print(f"Found user: {user_dict}")  # Debug log
+            return UserInDB(**user_dict)
+        return None
+    except Exception as e:
+        print(f"Error fetching user: {e}")
+        return None
 
 async def authenticate_user(username: str, password: str):
-    user = await get_user(username)
-    if not user:
+    try:
+        user = await get_user(username)
+        if not user:
+            print(f"User not found: {username}")  # Debug log
+            return False
+        
+        if not user.hashed_password:
+            print(f"No password hash for user: {username}")  # Debug log
+            return False
+            
+        valid = verify_password(password, user.hashed_password)
+        print(f"Password verification result: {valid}")  # Debug log
+        return user if valid else False
+    except Exception as e:
+        print(f"Authentication error: {e}")
         return False
-    if not verify_password(password, user.hashed_password):
-        return False
-    return user
 
 def create_access_token(data: dict, expires_delta: Optional[timedelta] = None):
     to_encode = data.copy()
@@ -181,18 +216,33 @@ async def get_current_active_user(current_user: User = Depends(get_current_user)
 # Auth Endpoints
 @app.post("/token", response_model=Token)
 async def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends()):
-    user = await authenticate_user(form_data.username, form_data.password)
-    if not user:
+    try:
+        print(f"Login attempt for user: {form_data.username}")  # Debug log
+        user = await authenticate_user(form_data.username, form_data.password)
+        
+        if not user:
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Incorrect username or password",
+                headers={"WWW-Authenticate": "Bearer"},
+            )
+        
+        access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
+        access_token = create_access_token(
+            data={"sub": user.username},
+            expires_delta=access_token_expires
+        )
+        
+        print(f"Login successful for user: {user.username}")  # Debug log
+        return {"access_token": access_token, "token_type": "bearer"}
+        
+    except Exception as e:
+        print(f"Login error: {str(e)}")
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Incorrect username or password",
+            detail="Authentication failed",
             headers={"WWW-Authenticate": "Bearer"},
         )
-    access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
-    access_token = create_access_token(
-        data={"sub": user.username}, expires_delta=access_token_expires
-    )
-    return {"access_token": access_token, "token_type": "bearer"}
 
 # User Endpoints
 @app.post("/users/", response_model=User)
@@ -202,17 +252,27 @@ async def create_user(user: UserCreate):
     if await db.users.find_one({"email": user.email}):
         raise HTTPException(status_code=400, detail="Email already registered")
     
-    hashed_password = get_password_hash(user.password)
-    user_dict = user.dict()
-    del user_dict["password"]
-    user_dict["hashed_password"] = hashed_password
-    user_dict["created_at"] = datetime.utcnow()
-    user_dict["completed_challenges"] = []
-    user_dict["points"] = 0
-    
-    result = await db.users.insert_one(user_dict)
-    created_user = await db.users.find_one({"_id": result.inserted_id})
-    return created_user
+    try:
+        user_dict = {
+            "username": user.username,
+            "email": user.email,
+            "full_name": user.full_name,
+            "hashed_password": get_password_hash(user.password),
+            "created_at": datetime.utcnow(),
+            "completed_challenges": [],
+            "points": 0,
+            "is_active": True
+        }
+        
+        result = await db.users.insert_one(user_dict)
+        created_user = await db.users.find_one({"_id": result.inserted_id})
+        return User(**created_user)
+    except Exception as e:
+        print(f"User creation error: {e}")
+        raise HTTPException(
+            status_code=500,
+            detail="Could not create user"
+        )
 
 @app.get("/users/me/", response_model=User)
 async def read_users_me(current_user: User = Depends(get_current_active_user)):

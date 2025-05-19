@@ -3,31 +3,26 @@ import api from './api';
 
 export const loginUser = async (username, password) => {
   try {
-    // FastAPI expects form data for token endpoint
-    const formData = new FormData();
+    const formData = new URLSearchParams();
     formData.append('username', username);
     formData.append('password', password);
     
-    const response = await api.post('/token', formData, {
+    const response = await api.post('/token', formData.toString(), {
       headers: {
-        'Content-Type': 'application/x-www-form-urlencoded'
+        'Content-Type': 'application/x-www-form-urlencoded',
       }
     });
     
     const token = response.data.access_token;
+    localStorage.setItem('token', token);
     
-    // Now get the user data
-    const userResponse = await api.get('/users/me', {
-      headers: {
-        Authorization: `Bearer ${token}`
-      }
-    });
-    
+    const userResponse = await api.get('/users/me');
     return {
       user: userResponse.data,
       token
     };
   } catch (error) {
+    console.error('Login error:', error.response?.data || error.message);
     throw new Error(error.response?.data?.detail || 'Login failed');
   }
 };

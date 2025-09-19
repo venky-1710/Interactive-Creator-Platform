@@ -1,11 +1,11 @@
 import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { BookOpen, Trophy, User, LogOut } from 'lucide-react';
+import { BookOpen, Trophy, User, LogOut, Settings } from 'lucide-react';
 import { useAuth } from '../hooks/useAuth';
 import './navbar.css';
 
 const Navbar = () => {
-  const { user, logout } = useAuth();
+  const { user, logout, isAdmin } = useAuth();
 
   const navigate = useNavigate();
 
@@ -24,13 +24,24 @@ const Navbar = () => {
             </Link>
           )}
           <Link to="/challenges" className="nav-link">
-
             <span>Challenges</span>
           </Link>
           <Link to="/leaderboard" className="nav-link">
             <Trophy className="icon" />
             <span>Leaderboard</span>
           </Link>
+          {isAdmin && (
+            <Link to="/admin" className="nav-link admin-link">
+              <Settings className="icon" />
+              <span>Admin Panel</span>
+            </Link>
+          )}
+          {isAdmin && (
+            <Link to="/admin" className="nav-link admin-link">
+              <Settings className="icon" />
+              <span>Admin</span>
+            </Link>
+          )}
           {user ? (
             <div className="user-section">
               <Link to="/profile" className="user-profile">

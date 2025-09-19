@@ -63,7 +63,7 @@ function ChallengeDetails() {
       setResult(null);
       
       const submissionData = {
-        challenge_id: challenge._id,
+        challenge_id: challenge.id || challenge._id,
         code,
         language
       };
@@ -109,12 +109,35 @@ function ChallengeDetails() {
           <div className="markdown-content">
             {challenge.description}
           </div>
-          <div className="instructions">
-            <h3>Instructions</h3>
-            <div className="markdown-content">
-              {challenge.content}
+          {(challenge.problem_statement || challenge.content) && (
+            <div className="instructions">
+              <h3>Problem Statement</h3>
+              <div className="markdown-content">
+                {challenge.problem_statement || challenge.content}
+              </div>
             </div>
-          </div>
+          )}
+          
+          {challenge.sample_input && challenge.sample_output && (
+            <div className="sample-io">
+              <h3>Sample Input/Output</h3>
+              <div className="sample-case">
+                <p><strong>Input:</strong></p>
+                <pre>{challenge.sample_input}</pre>
+                <p><strong>Output:</strong></p>
+                <pre>{challenge.sample_output}</pre>
+              </div>
+            </div>
+          )}
+          
+          {challenge.constraints && (
+            <div className="constraints">
+              <h3>Constraints</h3>
+              <div className="markdown-content">
+                {challenge.constraints}
+              </div>
+            </div>
+          )}
           
           {challenge.test_cases && challenge.test_cases.length > 0 && (
             <div className="test-cases">

@@ -175,3 +175,24 @@
 .sign-up-btn:hover {
   background-color: #4338ca;
 }
+
+/* Admin Link Styling */
+.admin-link {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  font-weight: 600;
+  position: relative;
+}
+
+.admin-link::after {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+.admin-link:hover {
+  background: linear-gradient(135deg, #5a67d8 0%, #6b46c1 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}

@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { BookOpen, Trophy, User, LogOut, Settings } from 'lucide-react';
+import { Trophy, User, LogOut, Settings } from 'lucide-react';
 import { useAuth } from '../hooks/useAuth';
 import './navbar.css';
 
@@ -13,8 +13,14 @@ const Navbar = () => {
     <nav className="navbar">
       <div className="navbar-inner">
         <Link to="/" className="logo-group">
-          <BookOpen className="logo-icon" />
-          <span className="logo-text">LearnHub</span>
+          <img
+            src={process.env.PUBLIC_URL + '/assets/logo.png'}
+            alt="LearnHub logo"
+            className="logo-image"
+            onError={(e) => {
+              e.currentTarget.style.display = 'none';
+            }}
+          />
         </Link>
         
         <div className="nav-links">

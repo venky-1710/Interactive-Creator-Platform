@@ -134,3 +134,32 @@
     margin-top: 0;
   }
 }
+
+.footer-logo {
+  width: 300px;            /* reduced base width */
+  height: auto;
+  max-height: 32px;       /* reduced max height */
+  object-fit: contain;     /* keep aspect ratio and avoid cropping */
+  display: block;
+  border-radius: 6px;      /* subtle rounding */
+  transition: transform 0.15s ease, opacity 0.15s ease;
+}
+
+.footer-logo:hover {
+  transform: translateY(-2px);
+  opacity: 0.95;
+}
+
+@media (min-width: 640px) {
+  .footer-logo {
+    width: 200px;
+    max-height: 40px;
+  }
+}
+
+@media (min-width: 1024px) {
+  .footer-logo {
+    width: 200px;
+    max-height: 480px;
+  }
+}

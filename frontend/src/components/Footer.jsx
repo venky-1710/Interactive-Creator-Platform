@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { BookOpen, Github, Twitter, Linkedin, Mail } from 'lucide-react';
+import { Github, Twitter, Linkedin, Mail } from 'lucide-react';
 import './Footer.css';
 
 const Footer = () => {
@@ -10,8 +10,14 @@ const Footer = () => {
         <div className="footer-grid">
           <div className="space-y-4">
             <Link to="/" className="footer-brand">
-              <BookOpen className="h-8 w-8 text-indigo-600" />
-              <span className="footer-brand-text">LearnHub</span>
+              <img
+                src={process.env.PUBLIC_URL + '/assets/logo.png'}
+                alt="LearnHub logo"
+                className="footer-logo"
+                onError={(e) => {
+                  e.currentTarget.style.display = 'none';
+                }}
+              />
             </Link>
             <p className="footer-description">
               Empowering developers through interactive learning and community engagement.

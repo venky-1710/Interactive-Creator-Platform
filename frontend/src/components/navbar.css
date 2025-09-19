@@ -21,10 +21,9 @@
 
 /* Logo Section */
 .logo-group {
-  display: flex;
+  display: inline-flex;
   align-items: center;
-  gap: 0.5rem;
-  text-decoration: none;
+  gap: 8px; /* space between icon and logo image */
 }
 
 .logo-icon {
@@ -38,15 +37,15 @@
   transform: scale(1.1);
 }
 
-.logo-text {
-  font-weight: 700;
-  font-size: 1.25rem;
-  color: #1e293b;
-  transition: color 0.3s;
+.logo-image {
+  height: 55px;
+  width: auto;
+  display: block;
 }
 
-.logo-group:hover .logo-text {
-  color: #4f46e5;
+/* optional: hide old text if still present */
+.logo-text {
+  display: none;
 }
 
 /* Navigation Links */
@@ -196,3 +195,4 @@
   -webkit-text-fill-color: transparent;
   background-clip: text;
 }
+

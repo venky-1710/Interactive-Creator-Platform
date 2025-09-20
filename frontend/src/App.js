@@ -1,5 +1,5 @@
 // src/App.jsx
-import { Routes, Route, Navigate } from 'react-router-dom';
+import { Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { useAuth } from './hooks/useAuth';
 import Navbar from './components/Navbar';
 import ErrorBoundary from './components/ErrorBoundary';
@@ -11,14 +11,19 @@ import ChallengeDetails from './pages/ChallengeDetails';
 import Leaderboard from './pages/Leaderboard';
 import Profile from './pages/Profile';
 import Home from './pages/Home';
+import PrivacyPolicy from './pages/PrivacyPolicy';
+import TermsOfService from './pages/TermsOfService';
+import ContactUs from './pages/ContactUs';
 import AdminLayout from './components/admin/AdminLayout';
 import AdminDashboardMain from './pages/admin/AdminDashboardMain';
 import AdminUsers from './pages/admin/AdminUsers';
 import AdminChallenges from './pages/admin/AdminChallenges';
+import Chatbot from './components/Chatbot';
 import './styles/enhancements.css';
 
 function App() {
   const { isAuthenticated, isAdmin, loading } = useAuth();
+  const location = useLocation();
 
   if (loading) {
     return <div className="loading-spinner">Loading...</div>;
@@ -38,6 +43,9 @@ function App() {
             <Route path="/challenges/:id" element={<ChallengeDetails />} />
             <Route path="/leaderboard" element={<Leaderboard />} />
             <Route path="/profile" element={isAuthenticated ? <Profile /> : <Navigate to="/login" />} />
+            <Route path="/privacy" element={<PrivacyPolicy />} />
+            <Route path="/terms" element={<TermsOfService />} />
+            <Route path="/contact" element={<ContactUs />} />
             
             {/* Admin Routes - Completely separate from user interface */}
             <Route path="/admin" element={isAuthenticated && isAdmin ? <AdminLayout /> : <Navigate to="/login" />}>
@@ -60,6 +68,8 @@ function App() {
             {/* <Route path="*" element={<NotFound />} /> */}
           </Routes>
         </main>
+        {/* Chatbot - Only show when authenticated and not in admin panel */}
+        {isAuthenticated && !location.pathname.startsWith('/admin') && <Chatbot />}
         {/* Remove the Footer component here */}
       </div>
     </ErrorBoundary>

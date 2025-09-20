@@ -14,6 +14,7 @@ import os
 import subprocess
 import tempfile
 from dotenv import load_dotenv
+import google.generativeai as genai
 
 # Load environment variables
 load_dotenv()
@@ -55,6 +56,11 @@ db = client.createathon
 SECRET_KEY = os.getenv("SECRET_KEY", "development_secret_key")
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 30
+
+# Configure Gemini AI
+GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
+if GEMINI_API_KEY:
+    genai.configure(api_key=GEMINI_API_KEY)
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
@@ -516,6 +522,73 @@ async def get_leaderboard():
         print(f"Leaderboard error: {e}")
         raise HTTPException(status_code=500, detail="Could not fetch leaderboard")
 
+@app.get("/users/{user_id}/stats")
+async def get_user_stats(user_id: str):
+    """Get detailed statistics for a specific user"""
+    try:
+        if not ObjectId.is_valid(user_id):
+            raise HTTPException(status_code=400, detail="Invalid user ID")
+        
+        user_obj_id = ObjectId(user_id)
+        
+        # Get user information
+        user = await db.users.find_one({"_id": user_obj_id})
+        if not user:
+            raise HTTPException(status_code=404, detail="User not found")
+        
+        # Get user's submissions
+        submissions = await db.submissions.find({"user_id": user_obj_id}).to_list(1000)
+        
+        # Calculate statistics
+        total_submissions = len(submissions)
+        successful_submissions = sum(1 for s in submissions if s.get("status") == "Completed")
+        
+        # Get unique challenges attempted
+        attempted_challenges = list(set(s.get("challenge_id") for s in submissions))
+        total_attempted = len(attempted_challenges)
+        
+        # Calculate average execution time
+        execution_times = [s.get("execution_time", 0) for s in submissions if s.get("execution_time")]
+        avg_execution_time = sum(execution_times) / len(execution_times) if execution_times else 0
+        
+        # Get recent submissions (last 10)
+        recent_submissions = sorted(submissions, key=lambda x: x.get("submitted_at", datetime.min), reverse=True)[:10]
+        
+        # Calculate success rate
+        success_rate = round((successful_submissions / total_submissions * 100)) if total_submissions > 0 else 0
+        
+        stats = {
+            "user_id": str(user_obj_id),
+            "username": user.get("username"),
+            "total_points": user.get("points", 0),
+            "completed_challenges": len(user.get("completed_challenges", [])),
+            "total_submissions": total_submissions,
+            "successful_submissions": successful_submissions,
+            "attempted_challenges": total_attempted,
+            "success_rate": success_rate,
+            "average_execution_time": round(avg_execution_time, 3) if avg_execution_time else 0,
+            "current_streak": 0,  # Simple implementation - can be enhanced
+            "recent_submissions": [
+                {
+                    "id": str(s["_id"]),
+                    "challenge_id": str(s["challenge_id"]),
+                    "status": s.get("status", "Unknown"),
+                    "points_earned": s.get("points_earned", 0),
+                    "submitted_at": s.get("submitted_at").isoformat() if s.get("submitted_at") else None,
+                    "execution_time": s.get("execution_time", 0)
+                }
+                for s in recent_submissions
+            ]
+        }
+        
+        return stats
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        print(f"User stats error: {e}")
+        raise HTTPException(status_code=500, detail="Could not fetch user statistics")
+
 # Admin Challenge Management Endpoints
 @app.get("/admin/challenges/", response_model=List[Challenge])
 async def admin_list_all_challenges(
@@ -918,6 +991,66 @@ async def health_check():
 import subprocess
 import tempfile
 import os
+
+# Chatbot Models
+class ChatMessage(BaseModel):
+    message: str
+    context: Optional[str] = None
+
+class ChatResponse(BaseModel):
+    response: str
+    error: Optional[str] = None
+
+# Chatbot Endpoint
+@app.post("/chatbot", response_model=ChatResponse)
+async def chat_with_gemini(
+    chat_message: ChatMessage, 
+    current_user: User = Depends(get_current_active_user)
+):
+    """
+    Chat with Gemini AI assistant for coding help and general questions
+    """
+    try:
+        if not GEMINI_API_KEY:
+            return ChatResponse(
+                response="I'm sorry, but the AI chatbot is currently unavailable. Please check the server configuration.",
+                error="Gemini API key not configured"
+            )
+        
+        # Create model instance
+        model = genai.GenerativeModel('gemini-1.5-flash')
+        
+        # Prepare the prompt with context
+        system_context = """You are an AI assistant for an Interactive Creator Platform - a coding learning platform. 
+        You help users with:
+        - Programming questions and debugging
+        - Explaining coding concepts
+        - Algorithm and data structure help
+        - Code review and optimization suggestions
+        - Learning resources and tips
+        
+        Keep your responses helpful, educational, and encouraging. Focus on helping users learn and improve their coding skills."""
+        
+        user_context = chat_message.context if chat_message.context else ""
+        full_prompt = f"{system_context}\n\nUser context: {user_context}\n\nUser question: {chat_message.message}"
+        
+        # Generate response
+        response = model.generate_content(full_prompt)
+        
+        if response.text:
+            return ChatResponse(response=response.text)
+        else:
+            return ChatResponse(
+                response="I'm sorry, I couldn't generate a response. Please try asking your question differently.",
+                error="No response generated"
+            )
+            
+    except Exception as e:
+        print(f"Chatbot error: {str(e)}")
+        return ChatResponse(
+            response="I'm sorry, I encountered an error while processing your request. Please try again later.",
+            error=str(e)
+        )
 
 class CompileRequest(BaseModel):
     code: str

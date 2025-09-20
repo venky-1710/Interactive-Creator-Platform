@@ -99,7 +99,7 @@ const Footer = () => {
         </div>
 
         <div className="footer-bottom">
-          <p className="footer-copyright">© 2024 LearnHub. All rights reserved.</p>
+          <p className="footer-copyright">© 2025 PraxisCode. All rights reserved.</p>
           <div className="footer-legal-links">
             <Link to="/privacy" className="footer-link">
               Privacy Policy

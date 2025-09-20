@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Trophy, User, LogOut, Settings, Menu, X } from 'lucide-react';
+import { Trophy, User, LogOut, Settings, Menu, X, Home } from 'lucide-react';
 import { useAuth } from '../hooks/useAuth';
 import './navbar.css';
 
@@ -56,6 +56,9 @@ const Navbar = () => {
           
           {/* Desktop Navigation */}
           <div className="nav-links desktop-nav">
+            <Link to="/" className="nav-link">
+              <span>Home</span>
+            </Link>
             {user && (
               <Link to="/dashboard" className="nav-link">
                 <span>Dashboard</span>
@@ -133,6 +136,10 @@ const Navbar = () => {
         </div>
 
         <div className="mobile-nav-links">
+          <Link to="/" className="mobile-nav-link" onClick={closeMobileMenu}>
+            <Home className="mobile-nav-icon" />
+            <span>Home</span>
+          </Link>
           {user && (
             <Link to="/dashboard" className="mobile-nav-link" onClick={closeMobileMenu}>
               <User className="mobile-nav-icon" />

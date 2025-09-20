@@ -1,0 +1,498 @@
+/* Privacy Policy Styles */
+.privacy-policy-container {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+  padding: 2rem 1rem;
+}
+
+.privacy-policy-content {
+  max-width: 800px;
+  margin: 0 auto;
+  background: white;
+  border-radius: 16px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+}
+
+/* Header Section */
+.privacy-header {
+  background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+  color: white;
+  padding: 3rem 2rem;
+  text-align: center;
+  position: relative;
+}
+
+.privacy-header::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="50" cy="50" r="40" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="0.5"/><circle cx="20" cy="20" r="15" fill="none" stroke="rgba(255,255,255,0.05)" stroke-width="0.5"/><circle cx="80" cy="80" r="20" fill="none" stroke="rgba(255,255,255,0.05)" stroke-width="0.5"/></svg>') repeat;
+  opacity: 0.3;
+}
+
+.privacy-icon {
+  position: relative;
+  z-index: 1;
+  margin-bottom: 1rem;
+  display: inline-flex;
+  padding: 1rem;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 50%;
+  backdrop-filter: blur(10px);
+}
+
+.privacy-title {
+  position: relative;
+  z-index: 1;
+  font-size: 2.5rem;
+  font-weight: 700;
+  margin: 0 0 1rem 0;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.privacy-subtitle {
+  position: relative;
+  z-index: 1;
+  font-size: 1.125rem;
+  opacity: 0.9;
+  margin: 0 0 1.5rem 0;
+  line-height: 1.6;
+  max-width: 600px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.privacy-meta {
+  position: relative;
+  z-index: 1;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: rgba(255, 255, 255, 0.15);
+  padding: 0.5rem 1rem;
+  border-radius: 25px;
+  font-size: 0.875rem;
+  backdrop-filter: blur(10px);
+}
+
+.privacy-date {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+/* Table of Contents */
+.privacy-toc {
+  padding: 2rem;
+  background: #f8fafc;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.privacy-toc h2 {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #1e293b;
+  margin: 0 0 1rem 0;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.privacy-toc ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 0.5rem;
+}
+
+.privacy-toc li {
+  margin: 0;
+}
+
+.privacy-toc a {
+  display: block;
+  padding: 0.75rem 1rem;
+  color: #4f46e5;
+  text-decoration: none;
+  border-radius: 8px;
+  transition: all 0.2s ease;
+  font-weight: 500;
+  border: 1px solid transparent;
+}
+
+.privacy-toc a:hover {
+  background: #4f46e5;
+  color: white;
+  transform: translateX(4px);
+  box-shadow: 0 4px 12px rgba(79, 70, 229, 0.2);
+}
+
+/* Content Sections */
+.privacy-sections {
+  padding: 0;
+}
+
+.privacy-section {
+  padding: 2.5rem 2rem;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.privacy-section:last-child {
+  border-bottom: none;
+}
+
+.section-header {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 1.5rem;
+}
+
+.section-header h2 {
+  font-size: 1.75rem;
+  font-weight: 600;
+  color: #1e293b;
+  margin: 0;
+}
+
+.section-header .lucide {
+  color: #4f46e5;
+  flex-shrink: 0;
+}
+
+.section-content {
+  color: #475569;
+  line-height: 1.7;
+}
+
+.section-content h3 {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #334155;
+  margin: 2rem 0 1rem 0;
+  padding-bottom: 0.5rem;
+  border-bottom: 2px solid #e2e8f0;
+}
+
+.section-content h3:first-child {
+  margin-top: 0;
+}
+
+.section-content p {
+  margin: 1rem 0;
+}
+
+.section-content ul {
+  margin: 1rem 0;
+  padding-left: 1.5rem;
+}
+
+.section-content li {
+  margin: 0.5rem 0;
+  position: relative;
+}
+
+.section-content li::marker {
+  color: #4f46e5;
+}
+
+.section-content a {
+  color: #4f46e5;
+  text-decoration: none;
+  font-weight: 500;
+  border-bottom: 1px solid transparent;
+  transition: border-color 0.2s ease;
+}
+
+.section-content a:hover {
+  border-bottom-color: #4f46e5;
+}
+
+/* Special Content Layouts */
+.use-cases {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 1.5rem;
+  margin: 2rem 0;
+}
+
+.use-case {
+  background: #f8fafc;
+  padding: 1.5rem;
+  border-radius: 12px;
+  border-left: 4px solid #4f46e5;
+}
+
+.use-case h3 {
+  margin-top: 0;
+  border: none;
+  padding-bottom: 0;
+  color: #1e293b;
+}
+
+.security-measures {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 1.5rem;
+  margin: 2rem 0;
+}
+
+.security-measure {
+  background: #f0fdf4;
+  padding: 1.5rem;
+  border-radius: 12px;
+  border-left: 4px solid #22c55e;
+}
+
+.security-measure h3 {
+  margin-top: 0;
+  border: none;
+  padding-bottom: 0;
+  color: #166534;
+}
+
+.security-note {
+  background: #fef3c7;
+  padding: 1.5rem;
+  border-radius: 12px;
+  border-left: 4px solid #f59e0b;
+  margin: 2rem 0;
+}
+
+.security-note p {
+  margin: 0;
+  color: #92400e;
+}
+
+.rights-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1rem;
+  margin: 2rem 0;
+}
+
+.right-item {
+  background: #f1f5f9;
+  padding: 1.5rem;
+  border-radius: 12px;
+  text-align: center;
+  border: 2px solid transparent;
+  transition: all 0.2s ease;
+}
+
+.right-item:hover {
+  border-color: #4f46e5;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(79, 70, 229, 0.1);
+}
+
+.right-item h3 {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: #1e293b;
+  margin: 0 0 0.5rem 0;
+  border: none;
+  padding: 0;
+}
+
+.right-item p {
+  font-size: 0.875rem;
+  margin: 0;
+  color: #64748b;
+}
+
+.contact-info {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1.5rem;
+  margin: 2rem 0;
+}
+
+.contact-method {
+  background: #f8fafc;
+  padding: 1.5rem;
+  border-radius: 12px;
+  text-align: center;
+  border: 1px solid #e2e8f0;
+}
+
+.contact-method h3 {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: #1e293b;
+  margin: 0 0 0.5rem 0;
+  border: none;
+  padding: 0;
+}
+
+.contact-method p {
+  margin: 0;
+  font-size: 0.875rem;
+}
+
+/* Footer */
+.privacy-footer {
+  background: #1e293b;
+  color: white;
+  padding: 2rem;
+  text-align: center;
+}
+
+.privacy-nav {
+  display: flex;
+  justify-content: center;
+  gap: 2rem;
+  margin-bottom: 1.5rem;
+  flex-wrap: wrap;
+}
+
+.nav-link {
+  color: #94a3b8;
+  text-decoration: none;
+  font-weight: 500;
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  transition: all 0.2s ease;
+}
+
+.privacy-footer-text {
+  margin: 0;
+  color: #94a3b8;
+  font-style: italic;
+}
+
+/* Mobile Responsiveness */
+@media (max-width: 768px) {
+  .privacy-policy-container {
+    padding: 1rem 0.5rem;
+  }
+
+  .privacy-title {
+    font-size: 2rem;
+  }
+
+  .privacy-subtitle {
+    font-size: 1rem;
+  }
+
+  .privacy-header {
+    padding: 2rem 1rem;
+  }
+
+  .privacy-toc {
+    padding: 1.5rem 1rem;
+  }
+
+  .privacy-toc ul {
+    grid-template-columns: 1fr;
+  }
+
+  .privacy-section {
+    padding: 2rem 1rem;
+  }
+
+  .section-header h2 {
+    font-size: 1.5rem;
+  }
+
+  .use-cases,
+  .security-measures,
+  .rights-grid,
+  .contact-info {
+    grid-template-columns: 1fr;
+  }
+
+  .privacy-nav {
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .privacy-footer {
+    padding: 1.5rem 1rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .privacy-title {
+    font-size: 1.75rem;
+  }
+
+  .section-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+
+  .section-header h2 {
+    font-size: 1.375rem;
+  }
+
+  .privacy-meta {
+    font-size: 0.75rem;
+    padding: 0.375rem 0.75rem;
+  }
+}
+
+/* Accessibility */
+@media (prefers-reduced-motion: reduce) {
+  .privacy-toc a,
+  .right-item,
+  .nav-link {
+    transition: none;
+  }
+
+  .privacy-toc a:hover {
+    transform: none;
+  }
+
+  .right-item:hover {
+    transform: none;
+  }
+}
+
+/* Print Styles */
+@media print {
+  .privacy-policy-container {
+    background: white;
+    padding: 0;
+  }
+
+  .privacy-header {
+    background: white;
+    color: black;
+    border-bottom: 2px solid #000;
+  }
+
+  .privacy-toc {
+    page-break-after: always;
+  }
+
+  .privacy-section {
+    page-break-inside: avoid;
+  }
+
+  .privacy-footer {
+    background: white;
+    color: black;
+    border-top: 2px solid #000;
+  }
+}
+
+/* Focus States for Accessibility */
+.privacy-toc a:focus,
+.nav-link:focus,
+.section-content a:focus {
+  outline: 2px solid #4f46e5;
+  outline-offset: 2px;
+}
+
+/* Smooth Scrolling */
+html {
+  scroll-behavior: smooth;
+}

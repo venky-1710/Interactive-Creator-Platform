@@ -4,6 +4,7 @@ import { Link } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
 import { getUserSubmissions } from '../services/challengeService';
 import { getChallengeById } from '../services/challengeService';
+import Calendar from '../components/Calendar';
 import './Dashboard.css';
 
 function Dashboard() {
@@ -83,8 +84,15 @@ function Dashboard() {
       </div>
       
       <div className="dashboard-content">
-        <section className="recent-activity">
-          <h2>Recent Activity</h2>
+        <div className="dashboard-left">
+          <section className="calendar-section">
+            <Calendar />
+          </section>
+        </div>
+
+        <div className="dashboard-right">
+          <section className="recent-activity">
+            <h2>Recent Activity</h2>
           {submissions.length === 0 ? (
             <div className="empty-state">
               <p>You haven't attempted any challenges yet.</p>
@@ -138,6 +146,7 @@ function Dashboard() {
             </div>
           </div>
         </section>
+        </div>
       </div>
     </div>
   );

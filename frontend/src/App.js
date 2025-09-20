@@ -14,6 +14,7 @@ import Home from './pages/Home';
 import PrivacyPolicy from './pages/PrivacyPolicy';
 import TermsOfService from './pages/TermsOfService';
 import ContactUs from './pages/ContactUs';
+import CalendarDemo from './pages/CalendarDemo';
 import AdminLayout from './components/admin/AdminLayout';
 import AdminDashboardMain from './pages/admin/AdminDashboardMain';
 import AdminUsers from './pages/admin/AdminUsers';
@@ -46,6 +47,7 @@ function App() {
             <Route path="/privacy" element={<PrivacyPolicy />} />
             <Route path="/terms" element={<TermsOfService />} />
             <Route path="/contact" element={<ContactUs />} />
+            <Route path="/calendar" element={<CalendarDemo />} />
             
             {/* Admin Routes - Completely separate from user interface */}
             <Route path="/admin" element={isAuthenticated && isAdmin ? <AdminLayout /> : <Navigate to="/login" />}>

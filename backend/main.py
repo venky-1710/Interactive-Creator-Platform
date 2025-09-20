@@ -185,6 +185,74 @@ class Submission(SubmissionBase):
         "json_encoders": {ObjectId: str}
     }
 
+# Event models
+class EventBase(BaseModel):
+    title: str
+    description: Optional[str] = ""
+    date: str  # ISO date string (YYYY-MM-DD)
+    time: Optional[str] = ""  # Time string (HH:MM)
+    type: str = "task"  # task, meeting, reminder, birthday, holiday, other
+    priority: str = "medium"  # low, medium, high, urgent
+    all_day: bool = False
+    reminder_minutes: int = 15
+
+class Event(EventBase):
+    id: str = Field(alias="_id")
+    user_id: str
+    created_at: datetime = Field(default_factory=datetime.utcnow)
+    updated_at: Optional[datetime] = None
+
+    model_config = {
+        "populate_by_name": True,
+        "arbitrary_types_allowed": True,
+        "json_encoders": {ObjectId: str}
+    }
+
+class EventUpdate(BaseModel):
+    title: Optional[str] = None
+    description: Optional[str] = None
+    date: Optional[str] = None
+    time: Optional[str] = None
+    type: Optional[str] = None
+    priority: Optional[str] = None
+    all_day: Optional[bool] = None
+    reminder_minutes: Optional[int] = None
+
+# Admin Event models (global events visible to all users)
+class AdminEventBase(BaseModel):
+    title: str
+    description: Optional[str] = ""
+    date: str  # ISO date string (YYYY-MM-DD)
+    time: Optional[str] = ""  # Time string (HH:MM)
+    type: str = "announcement"  # announcement, holiday, maintenance, deadline, other
+    priority: str = "medium"  # low, medium, high, urgent
+    all_day: bool = False
+    target_users: Optional[List[str]] = []  # Empty list means all users, or specific user IDs
+    is_public: bool = True  # Whether event is visible to all users
+
+class AdminEvent(AdminEventBase):
+    id: str = Field(alias="_id")
+    created_by: str  # Admin user ID
+    created_at: datetime = Field(default_factory=datetime.utcnow)
+    updated_at: Optional[datetime] = None
+
+    model_config = {
+        "populate_by_name": True,
+        "arbitrary_types_allowed": True,
+        "json_encoders": {ObjectId: str}
+    }
+
+class AdminEventUpdate(BaseModel):
+    title: Optional[str] = None
+    description: Optional[str] = None
+    date: Optional[str] = None
+    time: Optional[str] = None
+    type: Optional[str] = None
+    priority: Optional[str] = None
+    all_day: Optional[bool] = None
+    target_users: Optional[List[str]] = None
+    is_public: Optional[bool] = None
+
 # Helper functions
 def verify_password(plain_password, hashed_password):
     return pwd_context.verify(plain_password, hashed_password)
@@ -1211,6 +1279,483 @@ async def compile_code(request: CompileRequest, current_user: User = Depends(get
         except:
             pass
         return {"output": f"Execution error: {str(e)}", "error": True}
+
+
+# ================================= EVENT ENDPOINTS =================================
+
+@app.get("/user/events", response_model=List[Event])
+async def get_user_events(
+    date: Optional[str] = None,
+    start_date: Optional[str] = None,
+    end_date: Optional[str] = None,
+    current_user: User = Depends(get_current_active_user)
+):
+    """
+    Get events for the current user, optionally filtered by date or date range
+    """
+    try:
+        # Build query
+        query = {"user_id": current_user.id}
+        
+        if date:
+            # Filter by specific date
+            query["date"] = date
+        elif start_date and end_date:
+            # Filter by date range
+            query["date"] = {"$gte": start_date, "$lte": end_date}
+        elif start_date:
+            # Filter from start date onwards
+            query["date"] = {"$gte": start_date}
+        elif end_date:
+            # Filter up to end date
+            query["date"] = {"$lte": end_date}
+        
+        # Get events and sort by date and time
+        cursor = db.events.find(query).sort([("date", 1), ("time", 1)])
+        events = await cursor.to_list(length=1000)
+        
+        # Convert ObjectIds and return
+        return [convert_objectids_to_strings(event) for event in events]
+        
+    except Exception as e:
+        print(f"Error fetching user events: {str(e)}")
+        raise HTTPException(status_code=500, detail="Failed to fetch events")
+
+@app.post("/events", response_model=Event)
+async def create_event(
+    event_data: EventBase,
+    current_user: User = Depends(get_current_active_user)
+):
+    """
+    Create a new event for the current user
+    """
+    try:
+        # Validate date format (basic check)
+        try:
+            datetime.strptime(event_data.date, '%Y-%m-%d')
+        except ValueError:
+            raise HTTPException(status_code=400, detail="Invalid date format. Use YYYY-MM-DD")
+        
+        # Validate time format if provided
+        if event_data.time:
+            try:
+                datetime.strptime(event_data.time, '%H:%M')
+            except ValueError:
+                raise HTTPException(status_code=400, detail="Invalid time format. Use HH:MM")
+        
+        # Create event document
+        event_dict = event_data.model_dump()
+        event_dict.update({
+            "user_id": current_user.id,
+            "created_at": datetime.utcnow(),
+            "updated_at": None
+        })
+        
+        # Insert into database
+        result = await db.events.insert_one(event_dict)
+        
+        # Get the created event
+        created_event = await db.events.find_one({"_id": result.inserted_id})
+        
+        return convert_objectids_to_strings(created_event)
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        print(f"Error creating event: {str(e)}")
+        raise HTTPException(status_code=500, detail="Failed to create event")
+
+@app.get("/events/{event_id}", response_model=Event)
+async def get_event(
+    event_id: str,
+    current_user: User = Depends(get_current_active_user)
+):
+    """
+    Get a specific event by ID (only if it belongs to the current user)
+    """
+    try:
+        # Validate ObjectId format
+        if not ObjectId.is_valid(event_id):
+            raise HTTPException(status_code=400, detail="Invalid event ID format")
+        
+        # Find the event
+        event = await db.events.find_one({
+            "_id": ObjectId(event_id),
+            "user_id": current_user.id
+        })
+        
+        if not event:
+            raise HTTPException(status_code=404, detail="Event not found")
+        
+        return convert_objectids_to_strings(event)
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        print(f"Error fetching event: {str(e)}")
+        raise HTTPException(status_code=500, detail="Failed to fetch event")
+
+@app.put("/events/{event_id}", response_model=Event)
+async def update_event(
+    event_id: str,
+    event_update: EventUpdate,
+    current_user: User = Depends(get_current_active_user)
+):
+    """
+    Update an event (only if it belongs to the current user)
+    """
+    try:
+        # Validate ObjectId format
+        if not ObjectId.is_valid(event_id):
+            raise HTTPException(status_code=400, detail="Invalid event ID format")
+        
+        # Check if event exists and belongs to user
+        existing_event = await db.events.find_one({
+            "_id": ObjectId(event_id),
+            "user_id": current_user.id
+        })
+        
+        if not existing_event:
+            raise HTTPException(status_code=404, detail="Event not found")
+        
+        # Prepare update data
+        update_data = {}
+        for field, value in event_update.model_dump(exclude_unset=True).items():
+            if value is not None:
+                update_data[field] = value
+        
+        if not update_data:
+            raise HTTPException(status_code=400, detail="No update data provided")
+        
+        # Validate date format if being updated
+        if "date" in update_data:
+            try:
+                datetime.strptime(update_data["date"], '%Y-%m-%d')
+            except ValueError:
+                raise HTTPException(status_code=400, detail="Invalid date format. Use YYYY-MM-DD")
+        
+        # Validate time format if being updated
+        if "time" in update_data and update_data["time"]:
+            try:
+                datetime.strptime(update_data["time"], '%H:%M')
+            except ValueError:
+                raise HTTPException(status_code=400, detail="Invalid time format. Use HH:MM")
+        
+        # Add updated timestamp
+        update_data["updated_at"] = datetime.utcnow()
+        
+        # Update the event
+        result = await db.events.update_one(
+            {"_id": ObjectId(event_id), "user_id": current_user.id},
+            {"$set": update_data}
+        )
+        
+        if result.modified_count == 0:
+            raise HTTPException(status_code=400, detail="No changes made to event")
+        
+        # Return updated event
+        updated_event = await db.events.find_one({"_id": ObjectId(event_id)})
+        return convert_objectids_to_strings(updated_event)
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        print(f"Error updating event: {str(e)}")
+        raise HTTPException(status_code=500, detail="Failed to update event")
+
+@app.delete("/events/{event_id}")
+async def delete_event(
+    event_id: str,
+    current_user: User = Depends(get_current_active_user)
+):
+    """
+    Delete an event (only if it belongs to the current user)
+    """
+    try:
+        # Validate ObjectId format
+        if not ObjectId.is_valid(event_id):
+            raise HTTPException(status_code=400, detail="Invalid event ID format")
+        
+        # Delete the event
+        result = await db.events.delete_one({
+            "_id": ObjectId(event_id),
+            "user_id": current_user.id
+        })
+        
+        if result.deleted_count == 0:
+            raise HTTPException(status_code=404, detail="Event not found")
+        
+        return {"message": "Event deleted successfully"}
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        print(f"Error deleting event: {str(e)}")
+        raise HTTPException(status_code=500, detail="Failed to delete event")
+
+@app.get("/events", response_model=List[Event])
+async def get_all_user_events(current_user: User = Depends(get_current_active_user)):
+    """
+    Get all events for the current user
+    """
+    try:
+        cursor = db.events.find({"user_id": current_user.id}).sort([("date", 1), ("time", 1)])
+        events = await cursor.to_list(length=1000)
+        
+        return [convert_objectids_to_strings(event) for event in events]
+        
+    except Exception as e:
+        print(f"Error fetching all user events: {str(e)}")
+        raise HTTPException(status_code=500, detail="Failed to fetch events")
+
+# ================================= ADMIN EVENT ENDPOINTS =================================
+
+@app.get("/admin/events", response_model=List[AdminEvent])
+async def get_admin_events(
+    date: Optional[str] = None,
+    start_date: Optional[str] = None,
+    end_date: Optional[str] = None,
+    current_user: User = Depends(get_admin_user)
+):
+    """
+    Get all admin events (admin only)
+    """
+    try:
+        # Build query
+        query = {}
+        
+        if date:
+            query["date"] = date
+        elif start_date and end_date:
+            query["date"] = {"$gte": start_date, "$lte": end_date}
+        elif start_date:
+            query["date"] = {"$gte": start_date}
+        elif end_date:
+            query["date"] = {"$lte": end_date}
+        
+        cursor = db.admin_events.find(query).sort([("date", 1), ("time", 1)])
+        events = await cursor.to_list(length=1000)
+        
+        return [convert_objectids_to_strings(event) for event in events]
+        
+    except Exception as e:
+        print(f"Error fetching admin events: {str(e)}")
+        raise HTTPException(status_code=500, detail="Failed to fetch admin events")
+
+@app.get("/public/events", response_model=List[AdminEvent])
+async def get_public_events(
+    date: Optional[str] = None,
+    start_date: Optional[str] = None,
+    end_date: Optional[str] = None,
+    current_user: User = Depends(get_current_active_user)
+):
+    """
+    Get public admin events visible to all users
+    """
+    try:
+        # Build query for public events or events targeting this specific user
+        query = {
+            "$or": [
+                {"is_public": True},
+                {"target_users": current_user.id}
+            ]
+        }
+        
+        if date:
+            query["date"] = date
+        elif start_date and end_date:
+            query["date"] = {"$gte": start_date, "$lte": end_date}
+        elif start_date:
+            query["date"] = {"$gte": start_date}
+        elif end_date:
+            query["date"] = {"$lte": end_date}
+        
+        cursor = db.admin_events.find(query).sort([("date", 1), ("time", 1)])
+        events = await cursor.to_list(length=1000)
+        
+        return [convert_objectids_to_strings(event) for event in events]
+        
+    except Exception as e:
+        print(f"Error fetching public events: {str(e)}")
+        raise HTTPException(status_code=500, detail="Failed to fetch public events")
+
+@app.post("/admin/events", response_model=AdminEvent)
+async def create_admin_event(
+    event_data: AdminEventBase,
+    current_user: User = Depends(get_admin_user)
+):
+    """
+    Create a new admin event (admin only)
+    """
+    try:
+        # Validate date format
+        try:
+            datetime.strptime(event_data.date, '%Y-%m-%d')
+        except ValueError:
+            raise HTTPException(status_code=400, detail="Invalid date format. Use YYYY-MM-DD")
+        
+        # Validate time format if provided
+        if event_data.time:
+            try:
+                datetime.strptime(event_data.time, '%H:%M')
+            except ValueError:
+                raise HTTPException(status_code=400, detail="Invalid time format. Use HH:MM")
+        
+        # Validate target users if specified
+        if event_data.target_users:
+            for user_id in event_data.target_users:
+                if not ObjectId.is_valid(user_id):
+                    raise HTTPException(status_code=400, detail=f"Invalid user ID: {user_id}")
+                
+                # Check if user exists
+                user_exists = await db.users.find_one({"_id": ObjectId(user_id)})
+                if not user_exists:
+                    raise HTTPException(status_code=400, detail=f"User not found: {user_id}")
+        
+        # Create admin event document
+        event_dict = event_data.model_dump()
+        event_dict.update({
+            "created_by": current_user.id,
+            "created_at": datetime.utcnow(),
+            "updated_at": None
+        })
+        
+        # Insert into database
+        result = await db.admin_events.insert_one(event_dict)
+        
+        # Get the created event
+        created_event = await db.admin_events.find_one({"_id": result.inserted_id})
+        
+        return convert_objectids_to_strings(created_event)
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        print(f"Error creating admin event: {str(e)}")
+        raise HTTPException(status_code=500, detail="Failed to create admin event")
+
+@app.get("/admin/events/{event_id}", response_model=AdminEvent)
+async def get_admin_event(
+    event_id: str,
+    current_user: User = Depends(get_admin_user)
+):
+    """
+    Get a specific admin event by ID (admin only)
+    """
+    try:
+        if not ObjectId.is_valid(event_id):
+            raise HTTPException(status_code=400, detail="Invalid event ID format")
+        
+        event = await db.admin_events.find_one({"_id": ObjectId(event_id)})
+        
+        if not event:
+            raise HTTPException(status_code=404, detail="Admin event not found")
+        
+        return convert_objectids_to_strings(event)
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        print(f"Error fetching admin event: {str(e)}")
+        raise HTTPException(status_code=500, detail="Failed to fetch admin event")
+
+@app.put("/admin/events/{event_id}", response_model=AdminEvent)
+async def update_admin_event(
+    event_id: str,
+    event_update: AdminEventUpdate,
+    current_user: User = Depends(get_admin_user)
+):
+    """
+    Update an admin event (admin only)
+    """
+    try:
+        if not ObjectId.is_valid(event_id):
+            raise HTTPException(status_code=400, detail="Invalid event ID format")
+        
+        # Check if event exists
+        existing_event = await db.admin_events.find_one({"_id": ObjectId(event_id)})
+        if not existing_event:
+            raise HTTPException(status_code=404, detail="Admin event not found")
+        
+        # Prepare update data
+        update_data = {}
+        for field, value in event_update.model_dump(exclude_unset=True).items():
+            if value is not None:
+                update_data[field] = value
+        
+        if not update_data:
+            raise HTTPException(status_code=400, detail="No update data provided")
+        
+        # Validate date format if being updated
+        if "date" in update_data:
+            try:
+                datetime.strptime(update_data["date"], '%Y-%m-%d')
+            except ValueError:
+                raise HTTPException(status_code=400, detail="Invalid date format. Use YYYY-MM-DD")
+        
+        # Validate time format if being updated
+        if "time" in update_data and update_data["time"]:
+            try:
+                datetime.strptime(update_data["time"], '%H:%M')
+            except ValueError:
+                raise HTTPException(status_code=400, detail="Invalid time format. Use HH:MM")
+        
+        # Validate target users if being updated
+        if "target_users" in update_data and update_data["target_users"]:
+            for user_id in update_data["target_users"]:
+                if not ObjectId.is_valid(user_id):
+                    raise HTTPException(status_code=400, detail=f"Invalid user ID: {user_id}")
+                
+                user_exists = await db.users.find_one({"_id": ObjectId(user_id)})
+                if not user_exists:
+                    raise HTTPException(status_code=400, detail=f"User not found: {user_id}")
+        
+        # Add updated timestamp
+        update_data["updated_at"] = datetime.utcnow()
+        
+        # Update the event
+        result = await db.admin_events.update_one(
+            {"_id": ObjectId(event_id)},
+            {"$set": update_data}
+        )
+        
+        if result.modified_count == 0:
+            raise HTTPException(status_code=400, detail="No changes made to admin event")
+        
+        # Return updated event
+        updated_event = await db.admin_events.find_one({"_id": ObjectId(event_id)})
+        return convert_objectids_to_strings(updated_event)
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        print(f"Error updating admin event: {str(e)}")
+        raise HTTPException(status_code=500, detail="Failed to update admin event")
+
+@app.delete("/admin/events/{event_id}")
+async def delete_admin_event(
+    event_id: str,
+    current_user: User = Depends(get_admin_user)
+):
+    """
+    Delete an admin event (admin only)
+    """
+    try:
+        if not ObjectId.is_valid(event_id):
+            raise HTTPException(status_code=400, detail="Invalid event ID format")
+        
+        result = await db.admin_events.delete_one({"_id": ObjectId(event_id)})
+        
+        if result.deleted_count == 0:
+            raise HTTPException(status_code=404, detail="Admin event not found")
+        
+        return {"message": "Admin event deleted successfully"}
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        print(f"Error deleting admin event: {str(e)}")
+        raise HTTPException(status_code=500, detail="Failed to delete admin event")
 
 
 # Run with: uvicorn main:app --reload

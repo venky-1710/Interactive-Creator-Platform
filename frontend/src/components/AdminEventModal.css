@@ -1,0 +1,252 @@
+/* Admin Event Modal Styles */
+.admin-event-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  backdrop-filter: blur(5px);
+}
+
+.admin-event-modal {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+  width: 90%;
+  max-width: 600px;
+  max-height: 90vh;
+  overflow-y: auto;
+  animation: modalAppear 0.3s ease-out;
+  border: 2px solid #9b59b6;
+}
+
+@keyframes modalAppear {
+  from {
+    opacity: 0;
+    transform: scale(0.9) translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+.admin-event-modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px 24px 0;
+  border-bottom: 1px solid #e9ecef;
+  margin-bottom: 20px;
+  background: linear-gradient(135deg, #9b59b6 0%, #8e44ad 100%);
+  color: white;
+  border-radius: 10px 10px 0 0;
+}
+
+.admin-event-modal-header h2 {
+  margin: 0;
+  font-size: 24px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.admin-event-modal-header h2::before {
+  content: "👑";
+  font-size: 20px;
+}
+
+.admin-event-modal .close-button {
+  background: rgba(255, 255, 255, 0.2);
+  border: none;
+  font-size: 24px;
+  color: white;
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 50%;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  transition: all 0.2s ease;
+}
+
+.admin-event-modal .close-button:hover {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+.admin-event-form {
+  padding: 0 24px 24px;
+}
+
+.admin-event-form .form-group {
+  margin-bottom: 20px;
+}
+
+.admin-event-form .form-group.half {
+  flex: 1;
+}
+
+.admin-event-form .form-row {
+  display: flex;
+  gap: 16px;
+}
+
+.admin-event-form .form-group label {
+  display: block;
+  margin-bottom: 6px;
+  color: #333;
+  font-weight: 500;
+  font-size: 14px;
+}
+
+.admin-event-form .form-group input,
+.admin-event-form .form-group textarea,
+.admin-event-form .form-group select {
+  width: 100%;
+  padding: 10px 12px;
+  border: 2px solid #e1e5e9;
+  border-radius: 8px;
+  font-size: 14px;
+  transition: border-color 0.2s ease;
+  font-family: inherit;
+}
+
+.admin-event-form .form-group input:focus,
+.admin-event-form .form-group textarea:focus,
+.admin-event-form .form-group select:focus {
+  outline: none;
+  border-color: #9b59b6;
+  box-shadow: 0 0 0 3px rgba(155, 89, 182, 0.1);
+}
+
+.admin-event-form .form-group input.error,
+.admin-event-form .form-group textarea.error,
+.admin-event-form .form-group select.error {
+  border-color: #e74c3c;
+}
+
+.admin-event-form .form-group textarea {
+  resize: vertical;
+  min-height: 80px;
+}
+
+.admin-event-form .checkbox-label {
+  display: flex !important;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  font-weight: normal !important;
+}
+
+.admin-event-form .checkbox-label input[type="checkbox"] {
+  width: auto !important;
+  margin: 0;
+}
+
+.form-help {
+  display: block;
+  font-size: 12px;
+  color: #6c757d;
+  margin-top: 4px;
+  font-style: italic;
+}
+
+.admin-event-form .error-message {
+  color: #e74c3c;
+  font-size: 12px;
+  margin-top: 4px;
+  display: block;
+}
+
+.admin-event-form .form-actions {
+  display: flex;
+  gap: 12px;
+  justify-content: flex-end;
+  margin-top: 30px;
+  padding-top: 20px;
+  border-top: 1px solid #eee;
+}
+
+.admin-event-form .cancel-button,
+.admin-event-form .save-button {
+  padding: 10px 20px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: none;
+}
+
+.admin-event-form .cancel-button {
+  background-color: #f8f9fa;
+  color: #6c757d;
+  border: 1px solid #dee2e6;
+}
+
+.admin-event-form .cancel-button:hover {
+  background-color: #e9ecef;
+  color: #495057;
+}
+
+.admin-event-form .save-button {
+  background: linear-gradient(135deg, #9b59b6 0%, #8e44ad 100%);
+  color: white;
+  min-width: 120px;
+}
+
+.admin-event-form .save-button:hover {
+  background: linear-gradient(135deg, #8e44ad 0%, #7d3c98 100%);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(155, 89, 182, 0.3);
+}
+
+.admin-event-form .save-button:disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+/* Admin Badge */
+.admin-badge {
+  background: linear-gradient(135deg, #9b59b6 0%, #8e44ad 100%);
+  color: white;
+  font-size: 10px;
+  padding: 2px 6px;
+  border-radius: 8px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-left: 8px;
+}
+
+/* Responsive Design */
+@media (max-width: 600px) {
+  .admin-event-modal {
+    width: 95%;
+    margin: 20px;
+  }
+  
+  .admin-event-form .form-row {
+    flex-direction: column;
+    gap: 0;
+  }
+  
+  .admin-event-form .form-actions {
+    flex-direction: column-reverse;
+  }
+  
+  .admin-event-form .cancel-button,
+  .admin-event-form .save-button {
+    width: 100%;
+  }
+}

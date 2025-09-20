@@ -1,41 +1,93 @@
-/* src/components/admin/AdminSidebar.css */
+/* Mobile-First Admin Sidebar */
 .admin-sidebar {
   background: linear-gradient(180deg, #2d3748 0%, #1a202c 100%);
   color: white;
-  transition: width 0.3s ease;
+  transition: all 0.3s ease;
   overflow: hidden;
   border-right: 1px solid #4a5568;
-  box-shadow: 4px 0 12px rgba(0, 0, 0, 0.1);
+  box-shadow: 2px 0 8px rgba(0, 0, 0, 0.1);
+  position: fixed;
+  top: 60px;
+  left: 0;
+  height: calc(100vh - 60px);
+  z-index: 999;
+  transform: translateX(-100%);
 }
 
 .admin-sidebar.open {
   width: 280px;
+  transform: translateX(0);
 }
 
 .admin-sidebar.closed {
   width: 70px;
+  transform: translateX(-100%);
 }
 
 .sidebar-content {
-  padding: 20px 0;
+  padding: 1rem 0;
   height: 100%;
   overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
 }
 
+/* Responsive sidebar positioning */
+@media (min-width: 640px) {
+  .admin-sidebar {
+    top: 65px;
+    height: calc(100vh - 65px);
+  }
+}
+
+@media (min-width: 768px) {
+  .admin-sidebar {
+    top: 70px;
+    height: calc(100vh - 70px);
+    position: static;
+    transform: none;
+  }
+  
+  .admin-sidebar.open {
+    width: 240px;
+    transform: none;
+  }
+  
+  .admin-sidebar.closed {
+    width: 60px;
+    transform: none;
+  }
+}
+
+@media (min-width: 1024px) {
+  .admin-sidebar.open {
+    width: 280px;
+  }
+  
+  .admin-sidebar.closed {
+    width: 70px;
+  }
+  
+  .sidebar-content {
+    padding: 1.25rem 0;
+  }
+}
+
+/* Mobile-First Sidebar Sections */
 .sidebar-section {
-  margin-bottom: 32px;
+  margin-bottom: 1.5rem;
 }
 
 .section-title {
   color: #a0aec0;
-  font-size: 12px;
+  font-size: 0.75rem;
   font-weight: 600;
   text-transform: uppercase;
-  letter-spacing: 1px;
-  margin-bottom: 12px;
-  padding: 0 20px;
+  letter-spacing: 0.05em;
+  margin-bottom: 0.75rem;
+  padding: 0 1rem;
   opacity: 1;
-  transition: opacity 0.3s ease;
+  transition: all 0.3s ease;
+  line-height: 1.2;
 }
 
 .admin-sidebar.closed .section-title {
@@ -48,31 +100,58 @@
 .section-nav {
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 0.25rem;
 }
 
+/* Responsive section spacing */
+@media (min-width: 768px) {
+  .sidebar-section {
+    margin-bottom: 2rem;
+  }
+  
+  .section-title {
+    padding: 0 1.25rem;
+    margin-bottom: 0.875rem;
+  }
+  
+  .section-nav {
+    gap: 0.25rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .section-title {
+    margin-bottom: 1rem;
+  }
+}
+
+/* Mobile-First Navigation Items */
 .nav-item {
   display: block;
   text-decoration: none;
   color: #e2e8f0;
-  padding: 12px 20px;
-  margin: 0 12px;
-  border-radius: 8px;
-  transition: all 0.2s ease;
+  padding: 0.875rem 1rem;
+  margin: 0 0.75rem;
+  border-radius: 0.5rem;
+  transition: all 0.3s ease;
   position: relative;
   overflow: hidden;
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+  touch-action: manipulation;
 }
 
 .nav-item:hover {
   background: rgba(255, 255, 255, 0.1);
   color: white;
-  transform: translateX(4px);
+  transform: translateX(2px);
 }
 
 .nav-item.active {
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   color: white;
-  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+  box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
 }
 
 .nav-item.active::before {
@@ -81,29 +160,55 @@
   left: 0;
   top: 0;
   height: 100%;
-  width: 4px;
+  width: 3px;
   background: #ffd700;
 }
 
+/* Responsive navigation items */
+@media (min-width: 768px) {
+  .nav-item {
+    padding: 0.75rem 1.25rem;
+    margin: 0 0.75rem;
+    border-radius: 0.5rem;
+  }
+  
+  .nav-item:hover {
+    transform: translateX(4px);
+  }
+  
+  .nav-item.active::before {
+    width: 4px;
+  }
+  
+  .nav-item.active {
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+  }
+}
+
+/* Mobile-First Navigation Content */
 .nav-item-content {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 0.75rem;
   width: 100%;
 }
 
 .nav-icon {
-  min-width: 20px;
+  min-width: 1.25rem;
+  height: 1.25rem;
+  width: 1.25rem;
   color: currentColor;
+  flex-shrink: 0;
 }
 
 .nav-text {
   display: flex;
   flex-direction: column;
-  gap: 2px;
+  gap: 0.125rem;
   opacity: 1;
-  transition: opacity 0.3s ease;
+  transition: all 0.3s ease;
   overflow: hidden;
+  flex: 1;
 }
 
 .admin-sidebar.closed .nav-text {
@@ -112,24 +217,67 @@
 }
 
 .nav-label {
-  font-size: 14px;
+  font-size: 0.875rem;
   font-weight: 500;
-  line-height: 1.2;
+  line-height: 1.3;
+  white-space: nowrap;
 }
 
 .nav-description {
-  font-size: 11px;
+  font-size: 0.75rem;
   opacity: 0.7;
   line-height: 1.2;
+  white-space: nowrap;
 }
 
 .nav-item.active .nav-description {
   opacity: 0.9;
 }
 
-/* Scrollbar Styling */
+/* Responsive navigation content */
+@media (min-width: 768px) {
+  .nav-item-content {
+    gap: 0.875rem;
+  }
+  
+  .nav-icon {
+    min-width: 1.375rem;
+    height: 1.375rem;
+    width: 1.375rem;
+  }
+  
+  .nav-label {
+    font-size: 0.9rem;
+  }
+  
+  .nav-description {
+    font-size: 0.8rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .nav-item-content {
+    gap: 1rem;
+  }
+  
+  .nav-icon {
+    min-width: 1.5rem;
+    height: 1.5rem;
+    width: 1.5rem;
+  }
+  
+  .nav-label {
+    font-size: 1rem;
+  }
+  
+  .nav-description {
+    font-size: 0.875rem;
+  }
+}
+
+/* Mobile-First Scrollbar Styling */
 .sidebar-content::-webkit-scrollbar {
-  width: 4px;
+  width: 3px;
 }
 
 .sidebar-content::-webkit-scrollbar-track {
@@ -145,58 +293,96 @@
   background: rgba(255, 255, 255, 0.5);
 }
 
-/* Tooltip for closed sidebar */
-.admin-sidebar.closed .nav-item {
-  position: relative;
-}
-
-.admin-sidebar.closed .nav-item::after {
-  content: attr(data-tooltip);
-  position: absolute;
-  left: 70px;
-  top: 50%;
-  transform: translateY(-50%);
-  background: #1a202c;
-  color: white;
-  padding: 8px 12px;
-  border-radius: 6px;
-  font-size: 12px;
-  white-space: nowrap;
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity 0.3s ease;
-  z-index: 1000;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-}
-
-.admin-sidebar.closed .nav-item:hover::after {
-  opacity: 1;
-}
-
-/* Responsive Design */
-@media (max-width: 1024px) {
-  .admin-sidebar.open {
-    width: 240px;
+/* Mobile scrollbar */
+@media (max-width: 767px) {
+  .sidebar-content {
+    scrollbar-width: thin;
+    scrollbar-color: rgba(255, 255, 255, 0.3) rgba(255, 255, 255, 0.1);
   }
 }
 
-@media (max-width: 768px) {
-  .admin-sidebar {
-    position: fixed;
-    top: 70px;
-    left: 0;
-    height: calc(100vh - 70px);
-    z-index: 999;
-    transform: translateX(-100%);
-    transition: transform 0.3s ease;
+/* Tooltip for closed sidebar - desktop only */
+@media (min-width: 768px) {
+  .admin-sidebar.closed .nav-item {
+    position: relative;
+  }
+
+  .admin-sidebar.closed .nav-item::after {
+    content: attr(data-tooltip);
+    position: absolute;
+    left: 60px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: #1a202c;
+    color: white;
+    padding: 0.5rem 0.75rem;
+    border-radius: 0.375rem;
+    font-size: 0.75rem;
+    white-space: nowrap;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+    z-index: 1000;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  }
+
+  .admin-sidebar.closed .nav-item:hover::after {
+    opacity: 1;
+  }
+}
+
+@media (min-width: 1024px) {
+  .admin-sidebar.closed .nav-item::after {
+    left: 70px;
+  }
+}
+
+/* Mobile overlay for sidebar */
+.sidebar-overlay {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 998;
+}
+
+@media (max-width: 767px) {
+  .sidebar-overlay.active {
+    display: block;
+  }
+}
+
+/* Focus states for accessibility */
+.nav-item:focus {
+  outline: 2px solid rgba(255, 255, 255, 0.8);
+  outline-offset: -2px;
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  .nav-item {
+    border: 1px solid transparent;
   }
   
-  .admin-sidebar.open {
-    width: 280px;
-    transform: translateX(0);
+  .nav-item:hover,
+  .nav-item.active {
+    border-color: rgba(255, 255, 255, 0.3);
+  }
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+  .admin-sidebar,
+  .nav-item,
+  .nav-text,
+  .section-title {
+    transition: none;
   }
   
-  .admin-sidebar.closed {
-    transform: translateX(-100%);
+  .nav-item:hover {
+    transform: none;
   }
 }

@@ -1,51 +1,134 @@
-/* src/components/ProfileTabs.css */
+/* Mobile-First Profile Tabs */
 
 .profile-tabs {
+  margin-bottom: 1.5rem;
+  width: 100%;
+}
+
+.tab-buttons {
+  display: flex;
+  list-style-type: none;
+  padding: 0;
+  margin: 0;
+  border-bottom: 1px solid #e0e0e0;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.tab-buttons::-webkit-scrollbar {
+  display: none;
+}
+
+.tab-buttons button {
+  padding: 0.75rem 1rem;
+  cursor: pointer;
+  font-weight: 600;
+  color: #666;
+  background: none;
+  border: none;
+  transition: all 0.3s ease;
+  font-size: 0.875rem;
+  white-space: nowrap;
+  flex-shrink: 0;
+  min-width: 80px;
+  min-height: 44px;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.tab-buttons button:hover {
+  color: #4f46e5;
+  background-color: rgba(79, 70, 229, 0.05);
+}
+
+.tab-buttons button.active {
+  color: #4f46e5;
+  border-bottom: 2px solid #4f46e5;
+  background-color: rgba(79, 70, 229, 0.05);
+}
+
+.tab-content {
+  padding: 1.5rem 0;
+  min-height: 200px;
+}
+
+/* Responsive design */
+@media (min-width: 480px) {
+  .tab-buttons button {
+    padding: 0.875rem 1.25rem;
+    font-size: 0.9rem;
+    min-width: 100px;
+  }
+  
+  .tab-content {
+    padding: 1.75rem 0;
+  }
+}
+
+@media (min-width: 640px) {
+  .profile-tabs {
     margin-bottom: 2rem;
   }
   
   .tab-buttons {
-    display: flex;
-    list-style-type: none;
-    padding: 0;
-    margin: 0;
-    border-bottom: 1px solid #e0e0e0;
+    overflow-x: visible;
+    justify-content: flex-start;
   }
   
   .tab-buttons button {
     padding: 1rem 1.5rem;
-    cursor: pointer;
-    font-weight: bold;
-    color: #666;
-    background: none;
-    border: none;
-    transition: all 0.3s ease;
     font-size: 1rem;
-  }
-  
-  .tab-buttons button:hover {
-    color: #1890ff;
-  }
-  
-  .tab-buttons button.active {
-    color: #1890ff;
-    border-bottom: 2px solid #1890ff;
+    flex: 0 0 auto;
+    min-width: 120px;
   }
   
   .tab-content {
     padding: 2rem 0;
   }
-  
-  /* Responsive design */
-  @media (max-width: 768px) {
-    .tab-buttons {
-      flex-wrap: wrap;
-    }
-  
-    .tab-buttons button {
-      flex: 1 1 auto;
-      text-align: center;
-      padding: 0.75rem 1rem;
-    }
+}
+
+@media (min-width: 768px) {
+  .tab-buttons button {
+    padding: 1rem 2rem;
+    min-width: 140px;
   }
+}
+
+/* Tab content loading state */
+.tab-content-loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 200px;
+  color: #666;
+}
+
+/* Focus states for accessibility */
+.tab-buttons button:focus {
+  outline: 2px solid #4f46e5;
+  outline-offset: 2px;
+  z-index: 1;
+}
+
+/* Touch-friendly improvements */
+@media (max-width: 767px) {
+  .tab-buttons button {
+    touch-action: manipulation;
+  }
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  .tab-buttons button {
+    border: 1px solid transparent;
+  }
+  
+  .tab-buttons button.active {
+    border-color: currentColor;
+  }
+}
   

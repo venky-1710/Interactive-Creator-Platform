@@ -1,223 +1,525 @@
-/* src/pages/Dashboard.css */
+/* Mobile-First Dashboard CSS */
 
 .dashboard-container {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 2rem;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 1rem 0.75rem;
+  min-height: calc(100vh - 200px);
+}
+
+.dashboard-header {
+  margin-bottom: 1.5rem;
+  text-align: center;
+}
+
+.dashboard-header h1 {
+  font-size: 1.75rem;
+  color: #333;
+  margin-bottom: 0.75rem;
+  line-height: 1.3;
+}
+
+.user-stats {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+.stat-card {
+  background-color: #fff;
+  border: 1px solid #e0e0e0;
+  border-radius: 0.75rem;
+  padding: 1.25rem 1rem;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+  text-align: center;
+}
+
+.stat-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+}
+
+.stat-card h3 {
+  font-size: 1rem;
+  color: #666;
+  margin-bottom: 0.5rem;
+  font-weight: 500;
+}
+
+.stat-value {
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: #4f46e5;
+  line-height: 1;
+}
+
+.dashboard-content {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+/* Responsive dashboard */
+@media (min-width: 640px) {
+  .dashboard-container {
+    padding: 1.5rem 1rem;
   }
   
   .dashboard-header {
+    text-align: left;
     margin-bottom: 2rem;
   }
   
   .dashboard-header h1 {
-    font-size: 2.5rem;
-    color: #333;
-    margin-bottom: 1rem;
+    font-size: 2rem;
   }
   
   .user-stats {
-    display: flex;
-    gap: 1rem;
-    flex-wrap: wrap;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.25rem;
   }
   
   .stat-card {
-    background-color: #fff;
-    border: 1px solid #e0e0e0;
-    border-radius: 8px;
     padding: 1.5rem;
-    flex: 1;
-    min-width: 200px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    text-align: left;
   }
   
   .stat-card h3 {
-    font-size: 1.2rem;
-    color: #666;
-    margin-bottom: 0.5rem;
+    font-size: 1.125rem;
   }
   
   .stat-value {
     font-size: 2rem;
-    font-weight: bold;
-    color: #1890ff;
+  }
+}
+
+@media (min-width: 768px) {
+  .dashboard-container {
+    padding: 2rem 1.5rem;
+  }
+  
+  .dashboard-header h1 {
+    font-size: 2.25rem;
+  }
+  
+  .user-stats {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.5rem;
   }
   
   .dashboard-content {
-    display: flex;
+    flex-direction: row;
     gap: 2rem;
-    flex-wrap: wrap;
+  }
+}
+
+@media (min-width: 1024px) {
+  .dashboard-container {
+    padding: 2rem;
   }
   
-  .recent-activity, .recommended-challenges {
-    flex: 1;
-    min-width: 300px;
+  .dashboard-header h1 {
+    font-size: 2.5rem;
   }
   
+  .user-stats {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+  
+/* Mobile-First Content Sections */
+.recent-activity, .recommended-challenges {
+  flex: 1;
+  min-width: 100%;
+  background: white;
+  border-radius: 0.75rem;
+  padding: 1.5rem;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  border: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.recent-activity h2, .recommended-challenges h2 {
+  font-size: 1.375rem;
+  color: #333;
+  margin-bottom: 1rem;
+  font-weight: 600;
+  line-height: 1.3;
+}
+
+.empty-state {
+  text-align: center;
+  padding: 2rem 1rem;
+  background-color: #f8fafc;
+  border-radius: 0.75rem;
+  border: 1px solid #e2e8f0;
+}
+
+.empty-state p {
+  font-size: 1rem;
+  color: #64748b;
+  margin-bottom: 1.5rem;
+  line-height: 1.5;
+}
+
+.btn-primary {
+  background-color: #4f46e5;
+  color: #fff;
+  padding: 0.75rem 1.5rem;
+  border: none;
+  border-radius: 0.5rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
+  touch-action: manipulation;
+}
+
+.btn-primary:hover {
+  background-color: #4338ca;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(79, 70, 229, 0.2);
+}
+
+/* Responsive content sections */
+@media (min-width: 640px) {
   .recent-activity h2, .recommended-challenges h2 {
-    font-size: 1.8rem;
-    color: #333;
-    margin-bottom: 1rem;
+    font-size: 1.5rem;
   }
   
   .empty-state {
-    text-align: center;
-    padding: 2rem;
-    background-color: #f5f5f5;
-    border-radius: 8px;
+    padding: 2.5rem 2rem;
   }
   
   .empty-state p {
-    font-size: 1.1rem;
-    color: #666;
-    margin-bottom: 1rem;
+    font-size: 1.125rem;
   }
   
   .btn-primary {
-    background-color: #1890ff;
-    color: #fff;
-    padding: 0.5rem 1rem;
-    border: none;
-    border-radius: 4px;
     font-size: 1rem;
-    cursor: pointer;
-    transition: background-color 0.2s ease-in-out;
-    text-decoration: none;
-    display: inline-block;
+    padding: 0.875rem 1.75rem;
+  }
+}
+
+@media (min-width: 768px) {
+  .recent-activity, .recommended-challenges {
+    min-width: 300px;
+    padding: 2rem;
   }
   
-  .btn-primary:hover {
-    background-color: #40a9ff;
+  .recent-activity h2, .recommended-challenges h2 {
+    font-size: 1.75rem;
   }
-  
-  .activity-list {
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
+}
+
+@media (min-width: 1024px) {
+  .recent-activity h2, .recommended-challenges h2 {
+    font-size: 1.875rem;
   }
+}
   
+/* Mobile-First Activity Components */
+.activity-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.activity-item {
+  background-color: #fff;
+  border: 1px solid #e2e8f0;
+  border-radius: 0.75rem;
+  padding: 1rem;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  transition: all 0.3s ease;
+}
+
+.activity-item:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  border-color: rgba(79, 70, 229, 0.2);
+}
+
+.status-badge {
+  display: inline-block;
+  padding: 0.375rem 0.75rem;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  margin-bottom: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.025em;
+}
+
+.status-badge.completed { 
+  background-color: #dcfce7; 
+  color: #16a34a; 
+}
+
+.status-badge.attempted { 
+  background-color: #fef3c7; 
+  color: #d97706; 
+}
+
+.status-badge.failed { 
+  background-color: #fee2e2; 
+  color: #dc2626; 
+}
+
+.activity-item h3 {
+  font-size: 1.125rem;
+  color: #1e293b;
+  margin-bottom: 0.5rem;
+  font-weight: 600;
+  line-height: 1.3;
+}
+
+.activity-item p {
+  font-size: 0.875rem;
+  color: #64748b;
+  margin-bottom: 0.75rem;
+  line-height: 1.5;
+}
+
+.btn-secondary {
+  background-color: #f1f5f9;
+  color: #475569;
+  padding: 0.625rem 1rem;
+  border: 1px solid #e2e8f0;
+  border-radius: 0.5rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
+  touch-action: manipulation;
+}
+
+.btn-secondary:hover {
+  background-color: #e2e8f0;
+  border-color: #cbd5e1;
+  transform: translateY(-1px);
+}
+
+/* Responsive activity components */
+@media (min-width: 640px) {
   .activity-item {
-    background-color: #fff;
-    border: 1px solid #e0e0e0;
-    border-radius: 8px;
-    padding: 1rem;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    padding: 1.25rem;
   }
-  
-  .status-badge {
-    display: inline-block;
-    padding: 0.25rem 0.5rem;
-    border-radius: 4px;
-    font-size: 0.9rem;
-    font-weight: bold;
-    margin-bottom: 0.5rem;
-  }
-  
-  .status-badge.completed { background-color: #f6ffed; color: #52c41a; }
-  .status-badge.attempted { background-color: #fff7e6; color: #fa8c16; }
-  .status-badge.failed { background-color: #fff1f0; color: #ff4d4f; }
   
   .activity-item h3 {
     font-size: 1.2rem;
-    color: #333;
-    margin-bottom: 0.5rem;
   }
   
   .activity-item p {
     font-size: 0.9rem;
-    color: #666;
-    margin-bottom: 0.5rem;
   }
   
   .btn-secondary {
-    background-color: #f5f5f5;
-    color: #333;
-    padding: 0.5rem 1rem;
-    border: none;
-    border-radius: 4px;
     font-size: 0.9rem;
-    cursor: pointer;
-    transition: background-color 0.2s ease-in-out;
-    text-decoration: none;
-    display: inline-block;
+    padding: 0.75rem 1.25rem;
+  }
+}
+
+@media (min-width: 768px) {
+  .activity-item {
+    padding: 1.5rem;
   }
   
-  .btn-secondary:hover {
-    background-color: #e0e0e0;
+  .activity-item h3 {
+    font-size: 1.25rem;
   }
   
+  .activity-item p {
+    font-size: 1rem;
+  }
+  
+  .btn-secondary {
+    font-size: 1rem;
+  }
+}
+  
+/* Mobile-First View All and Challenge Components */
+.view-all {
+  text-align: center;
+  margin-top: 1.5rem;
+}
+
+.view-all a {
+  color: #4f46e5;
+  text-decoration: none;
+  font-weight: 500;
+  font-size: 0.875rem;
+  padding: 0.5rem 1rem;
+  border-radius: 0.375rem;
+  transition: all 0.3s ease;
+  display: inline-block;
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.view-all a:hover {
+  background-color: rgba(79, 70, 229, 0.05);
+  color: #4338ca;
+  transform: translateY(-1px);
+}
+
+.challenges-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1rem;
+}
+
+.challenge-card {
+  background-color: #fff;
+  border: 1px solid #e2e8f0;
+  border-radius: 0.75rem;
+  padding: 1rem;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  transition: all 0.3s ease;
+}
+
+.challenge-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  border-color: rgba(79, 70, 229, 0.2);
+}
+
+.difficulty {
+  display: inline-block;
+  padding: 0.375rem 0.75rem;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  margin-bottom: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.025em;
+}
+
+.difficulty.beginner { 
+  background-color: #dcfce7; 
+  color: #16a34a; 
+}
+
+.difficulty.intermediate { 
+  background-color: #fef3c7; 
+  color: #d97706; 
+}
+
+.difficulty.advanced { 
+  background-color: #fee2e2; 
+  color: #dc2626; 
+}
+
+.challenge-card h3 {
+  font-size: 1.125rem;
+  color: #1e293b;
+  margin-bottom: 0.5rem;
+  font-weight: 600;
+  line-height: 1.3;
+}
+
+.challenge-card p {
+  font-size: 0.875rem;
+  color: #64748b;
+  margin-bottom: 1rem;
+  line-height: 1.5;
+}
+
+.loading, .error-message {
+  text-align: center;
+  padding: 2rem 1rem;
+  font-size: 1rem;
+  color: #64748b;
+  border-radius: 0.75rem;
+  background-color: #f8fafc;
+}
+
+.error-message {
+  color: #dc2626;
+  background-color: #fee2e2;
+  border: 1px solid #fecaca;
+}
+
+/* Responsive challenges and utilities */
+@media (min-width: 640px) {
   .view-all {
     text-align: right;
-    margin-top: 1rem;
   }
   
   .view-all a {
-    color: #1890ff;
-    text-decoration: none;
-  }
-  
-  .view-all a:hover {
-    text-decoration: underline;
+    font-size: 0.9rem;
   }
   
   .challenges-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-    gap: 1rem;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.25rem;
   }
   
   .challenge-card {
-    background-color: #fff;
-    border: 1px solid #e0e0e0;
-    border-radius: 8px;
-    padding: 1rem;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    padding: 1.25rem;
   }
-  
-  .difficulty {
-    display: inline-block;
-    padding: 0.25rem 0.5rem;
-    border-radius: 4px;
-    font-size: 0.9rem;
-    font-weight: bold;
-    margin-bottom: 0.5rem;
-  }
-  
-  .difficulty.beginner { background-color: #e6f7ff; color: #0066cc; }
-  .difficulty.intermediate { background-color: #fff7e6; color: #ff9900; }
-  .difficulty.advanced { background-color: #fff1f0; color: #ff4d4f; }
   
   .challenge-card h3 {
     font-size: 1.2rem;
-    color: #333;
-    margin-bottom: 0.5rem;
   }
   
   .challenge-card p {
     font-size: 0.9rem;
-    color: #666;
-    margin-bottom: 1rem;
+  }
+}
+
+@media (min-width: 768px) {
+  .view-all a {
+    font-size: 1rem;
+  }
+  
+  .challenges-grid {
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 1.5rem;
+  }
+  
+  .challenge-card {
+    padding: 1.5rem;
+  }
+  
+  .challenge-card h3 {
+    font-size: 1.25rem;
+  }
+  
+  .challenge-card p {
+    font-size: 1rem;
   }
   
   .loading, .error-message {
-    text-align: center;
-    padding: 2rem;
-    font-size: 1.1rem;
-    color: #666;
+    padding: 3rem 2rem;
+    font-size: 1.125rem;
   }
-  
-  .error-message {
-    color: #ff4d4f;
+}
+
+@media (min-width: 1024px) {
+  .challenges-grid {
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
   }
-  
-  @media (max-width: 768px) {
-    .dashboard-content {
-      flex-direction: column;
-    }
-  
-    .stat-card {
-      min-width: 100%;
-    }
-  }
+}
+
+/* Focus states for accessibility */
+.btn-primary:focus,
+.btn-secondary:focus,
+.view-all a:focus {
+  outline: 2px solid #4f46e5;
+  outline-offset: 2px;
+}
   

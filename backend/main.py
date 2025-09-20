@@ -188,7 +188,11 @@ def get_password_hash(password):
 
 async def get_user(username: str):
     try:
+        # Try to find user by username first, then by email
         user_dict = await db.users.find_one({"username": username})
+        if not user_dict:
+            user_dict = await db.users.find_one({"email": username})
+        
         if user_dict:
             print(f"Found user: {user_dict}")  # Debug log
             # Convert ObjectId to string for Pydantic
@@ -270,9 +274,10 @@ async def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends(
         user = await authenticate_user(form_data.username, form_data.password)
         
         if not user:
+            print(f"Authentication failed for user: {form_data.username}")  # Debug log
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED,
-                detail="Incorrect username or password",
+                detail="Incorrect username/email or password",
                 headers={"WWW-Authenticate": "Bearer"},
             )
         
@@ -285,6 +290,8 @@ async def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends(
         print(f"Login successful for user: {user.username}")  # Debug log
         return {"access_token": access_token, "token_type": "bearer"}
         
+    except HTTPException:
+        raise  # Re-raise HTTP exceptions as-is
     except Exception as e:
         print(f"Login error: {str(e)}")
         raise HTTPException(
@@ -442,16 +449,29 @@ async def admin_update_user(
 # User Endpoints
 @app.post("/users/", response_model=User)
 async def create_user(user: UserCreate):
+    # Check for existing username
     if await db.users.find_one({"username": user.username}):
         raise HTTPException(status_code=400, detail="Username already registered")
+    
+    # Check for existing email
     if await db.users.find_one({"email": user.email}):
         raise HTTPException(status_code=400, detail="Email already registered")
     
+    # Validate input data
+    if not user.username.strip():
+        raise HTTPException(status_code=400, detail="Username cannot be empty")
+    if not user.email.strip():
+        raise HTTPException(status_code=400, detail="Email cannot be empty")
+    if not user.password:
+        raise HTTPException(status_code=400, detail="Password cannot be empty")
+    if len(user.password) < 6:
+        raise HTTPException(status_code=400, detail="Password must be at least 6 characters long")
+    
     try:
         user_dict = {
-            "username": user.username,
-            "email": user.email,
-            "full_name": user.full_name,
+            "username": user.username.strip(),
+            "email": user.email.strip().lower(),
+            "full_name": user.full_name.strip() if user.full_name else "",
             "role": user.role,
             "hashed_password": get_password_hash(user.password),
             "created_at": datetime.utcnow(),
@@ -462,12 +482,21 @@ async def create_user(user: UserCreate):
         
         result = await db.users.insert_one(user_dict)
         created_user = await db.users.find_one({"_id": result.inserted_id})
-        return User(**created_user)
+        
+        # Convert ObjectId to string for Pydantic compatibility
+        if created_user:
+            created_user["_id"] = str(created_user["_id"])
+            return User(**created_user)
+        else:
+            raise HTTPException(status_code=500, detail="User creation failed - could not retrieve created user")
+            
+    except HTTPException:
+        raise  # Re-raise HTTP exceptions as-is
     except Exception as e:
         print(f"User creation error: {e}")
         raise HTTPException(
             status_code=500,
-            detail="Could not create user"
+            detail=f"Could not create user: {str(e)}"
         )
 
 @app.get("/users/me/", response_model=User)

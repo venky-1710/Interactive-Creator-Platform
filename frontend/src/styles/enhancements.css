@@ -320,9 +320,7 @@
 }
 
 /* Form Improvements */
-.form-group {
-  margin-bottom: 1.5rem;
-}
+
 
 .form-group label {
   display: flex;
@@ -330,7 +328,6 @@
   gap: 0.5rem;
   font-weight: 600;
   color: #374151;
-  margin-bottom: 0.5rem;
 }
 
 .form-group input,

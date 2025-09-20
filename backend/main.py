@@ -943,14 +943,78 @@ async def create_submission(
             detail=f"Failed to create submission: {str(e)}"
         )
 
-@app.get("/submissions/", response_model=List[Submission])
+@app.get("/submissions/")
 async def list_user_submissions(current_user: User = Depends(get_current_active_user)):
-    submissions = await db.submissions.find({"user_id": current_user.id}).to_list(100)
-    
-    # Convert all ObjectId fields to strings for Pydantic compatibility
-    processed_submissions = convert_objectids_to_strings(submissions)
-    
-    return processed_submissions
+    try:
+        # Convert user ID to ObjectId if it's a string
+        user_obj_id = ObjectId(current_user.id) if isinstance(current_user.id, str) else current_user.id
+        
+        print(f"Fetching submissions for user: {current_user.username}, ID: {current_user.id}, ObjectId: {user_obj_id}")  # Debug log
+        
+        # Get submissions for the current user - try both string and ObjectId formats
+        submissions = await db.submissions.find({
+            "$or": [
+                {"user_id": user_obj_id},
+                {"user_id": current_user.id},
+                {"user_id": str(user_obj_id)}
+            ]
+        }).to_list(100)
+        
+        print(f"Found {len(submissions)} submissions for user {current_user.username}")  # Debug log
+        
+        # Enrich submissions with challenge information
+        enriched_submissions = []
+        
+        for submission in submissions:
+            try:
+                # Get challenge details
+                challenge = await db.challenges.find_one({"_id": submission["challenge_id"]})
+                
+                if challenge:
+                    # Create enriched submission with challenge info
+                    enriched_submission = {
+                        "id": str(submission["_id"]),
+                        "challenge_id": str(submission["challenge_id"]),
+                        "challenge_name": challenge.get("title", "Unknown Challenge"),
+                        "difficulty": challenge.get("difficulty", "Medium"),
+                        "category": challenge.get("category", "General"),
+                        "status": submission.get("status", "Unknown"),
+                        "points": submission.get("points_earned", 0),
+                        "submitted_at": submission.get("submitted_at").isoformat() if submission.get("submitted_at") else None,
+                        "language": submission.get("language", "Unknown"),
+                        "execution_time": submission.get("execution_time", 0),
+                        "test_results": submission.get("test_results", [])
+                    }
+                    enriched_submissions.append(enriched_submission)
+                else:
+                    # If challenge not found, still include submission with basic info
+                    enriched_submission = {
+                        "id": str(submission["_id"]),
+                        "challenge_id": str(submission["challenge_id"]),
+                        "challenge_name": "Challenge Not Found",
+                        "difficulty": "Unknown",
+                        "category": "Unknown",
+                        "status": submission.get("status", "Unknown"),
+                        "points": submission.get("points_earned", 0),
+                        "submitted_at": submission.get("submitted_at").isoformat() if submission.get("submitted_at") else None,
+                        "language": submission.get("language", "Unknown"),
+                        "execution_time": submission.get("execution_time", 0),
+                        "test_results": submission.get("test_results", [])
+                    }
+                    enriched_submissions.append(enriched_submission)
+                    
+            except Exception as e:
+                print(f"Error enriching submission {submission.get('_id')}: {str(e)}")
+                continue
+        
+        return enriched_submissions
+        
+    except Exception as e:
+        print(f"Error fetching user submissions: {str(e)}")
+        raise HTTPException(
+            status_code=500,
+            detail=f"Failed to fetch submissions: {str(e)}"
+        )
 
 # Health and Status Endpoints
 @app.get("/")

@@ -46,11 +46,10 @@ export const submitChallenge = async (submissionData) => {
 };
 
 export const getUserSubmissions = async () => {
-
   try {
     const response = await api.get('/submissions/');
     return response.data;
   } catch (error) {
-    throw new Error('Failed to fetch submissions');
+    throw new Error(`Failed to fetch submissions: ${error.response?.data?.detail || error.message}`);
   }
 };

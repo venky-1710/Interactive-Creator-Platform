@@ -268,7 +268,7 @@ async def get_user(username: str):
             user_dict = await db.users.find_one({"email": username})
         
         if user_dict:
-            print(f"Found user: {user_dict}")  # Debug log
+            # Debug log removed to reduce console spam
             # Convert ObjectId to string for Pydantic
             if "_id" in user_dict:
                 user_dict["_id"] = str(user_dict["_id"])
@@ -284,15 +284,15 @@ async def authenticate_user(username: str, password: str):
     try:
         user = await get_user(username)
         if not user:
-            print(f"User not found: {username}")  # Debug log
+            # Debug log removed to reduce console spam
             return False
         
         if not user.hashed_password:
-            print(f"No password hash for user: {username}")  # Debug log
+            # Debug log removed to reduce console spam
             return False
             
         valid = verify_password(password, user.hashed_password)
-        print(f"Password verification result: {valid}")  # Debug log
+        # Debug log removed to reduce console spam
         return user if valid else False
     except Exception as e:
         print(f"Authentication error: {e}")
@@ -344,11 +344,11 @@ async def get_admin_user(current_user: User = Depends(get_current_active_user)):
 @app.post("/token", response_model=Token)
 async def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends()):
     try:
-        print(f"Login attempt for user: {form_data.username}")  # Debug log
+        # Debug log removed to reduce console spam
         user = await authenticate_user(form_data.username, form_data.password)
         
         if not user:
-            print(f"Authentication failed for user: {form_data.username}")  # Debug log
+            # Debug log removed to reduce console spam
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED,
                 detail="Incorrect username/email or password",
@@ -361,7 +361,7 @@ async def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends(
             expires_delta=access_token_expires
         )
         
-        print(f"Login successful for user: {user.username}")  # Debug log
+        # Debug log removed to reduce console spam
         return {"access_token": access_token, "token_type": "bearer"}
         
     except HTTPException:
@@ -797,7 +797,7 @@ async def admin_create_challenge(
             
         return created_challenge
     except Exception as e:
-        print(f"Challenge creation error: {str(e)}")  # Debug log
+        print(f"Challenge creation error: {str(e)}")
         raise HTTPException(status_code=500, detail=f"Could not create challenge: {str(e)}")
 
 # Challenge Endpoints
@@ -853,8 +853,7 @@ async def create_submission(
     submission: SubmissionBase, current_user: User = Depends(get_current_active_user)
 ):
     try:
-        print(f"Received submission: {submission.dict()}")  # Debug log
-        print(f"Current user: {current_user.username}, ID: {current_user.id}")  # Debug log
+        # Debug logs removed to reduce console spam
         
         # Convert challenge_id to ObjectId if it's a string
         if isinstance(submission.challenge_id, str):
@@ -1005,7 +1004,7 @@ async def create_submission(
         return convert_objectids_to_strings(created_submission)
         
     except Exception as e:
-        print(f"Submission creation error: {str(e)}")  # Debug log
+        print(f"Submission creation error: {str(e)}")
         raise HTTPException(
             status_code=500,
             detail=f"Failed to create submission: {str(e)}"
@@ -1017,7 +1016,7 @@ async def list_user_submissions(current_user: User = Depends(get_current_active_
         # Convert user ID to ObjectId if it's a string
         user_obj_id = ObjectId(current_user.id) if isinstance(current_user.id, str) else current_user.id
         
-        print(f"Fetching submissions for user: {current_user.username}, ID: {current_user.id}, ObjectId: {user_obj_id}")  # Debug log
+        # Debug log removed to reduce console spam
         
         # Get submissions for the current user - try both string and ObjectId formats
         submissions = await db.submissions.find({
@@ -1028,7 +1027,7 @@ async def list_user_submissions(current_user: User = Depends(get_current_active_
             ]
         }).to_list(100)
         
-        print(f"Found {len(submissions)} submissions for user {current_user.username}")  # Debug log
+        # Debug log removed to reduce console spam
         
         # Enrich submissions with challenge information
         enriched_submissions = []
@@ -1757,6 +1756,425 @@ async def delete_admin_event(
         print(f"Error deleting admin event: {str(e)}")
         raise HTTPException(status_code=500, detail="Failed to delete admin event")
 
+
+# ================================= CHAT ENDPOINTS =================================
+
+# Chat models
+class MessageBase(BaseModel):
+    receiver_id: str
+    content: str
+
+class Message(BaseModel):
+    id: str = Field(alias="_id")
+    sender_id: str
+    receiver_id: str
+    content: str
+    created_at: datetime = Field(default_factory=datetime.utcnow)
+    read_at: Optional[datetime] = None
+    sender_name: Optional[str] = None
+    receiver_name: Optional[str] = None
+
+    model_config = {
+        "populate_by_name": True,
+        "arbitrary_types_allowed": True,
+        "json_encoders": {ObjectId: str}
+    }
+
+class UserStatus(BaseModel):
+    is_online: bool = True
+    last_seen: Optional[datetime] = None
+
+class ChatUser(BaseModel):
+    id: str = Field(alias="_id")
+    username: str
+    full_name: Optional[str] = None
+    email: str
+    is_online: bool = False
+    last_seen: Optional[datetime] = None
+    avatar: Optional[str] = None
+
+    model_config = {
+        "populate_by_name": True,
+        "arbitrary_types_allowed": True,
+        "json_encoders": {ObjectId: str}
+    }
+
+# Helper function to get chat users with online status
+async def get_chat_users_with_status():
+    """Get all users with their online status"""
+    try:
+        # Get all users except admins for chat
+        users = await db.users.find({"role": {"$ne": "admin"}}).to_list(1000)
+        
+        chat_users = []
+        current_time = datetime.utcnow()
+        
+        for user in users:
+            user_dict = convert_objectids_to_strings(user)
+            
+            # Determine online status (online if last_seen within 5 minutes)
+            last_seen = user.get("last_seen")
+            is_online = False
+            
+            if last_seen:
+                time_diff = current_time - last_seen
+                is_online = time_diff.total_seconds() < 300  # 5 minutes
+            
+            chat_user = {
+                "_id": user_dict["_id"],  # Keep _id for Pydantic alias to work
+                "username": user_dict["username"],
+                "full_name": user_dict.get("full_name"),
+                "email": user_dict["email"],
+                "is_online": is_online,
+                "last_seen": last_seen,
+                "avatar": user_dict.get("avatar")
+            }
+            
+            chat_users.append(chat_user)
+        
+        return chat_users
+    except Exception as e:
+        print(f"Error getting chat users: {str(e)}")
+        return []
+
+@app.get("/chat/users")
+async def get_chat_users(current_user: User = Depends(get_current_active_user)):
+    """Get all users available for chat"""
+    try:
+        chat_users = await get_chat_users_with_status()
+        
+        # Filter out current user and ensure proper ID field
+        filtered_users = []
+        for user in chat_users:
+            if user["_id"] != current_user.id:
+                # Convert _id to id for frontend compatibility
+                user_data = {
+                    "id": user["_id"],
+                    "username": user["username"],
+                    "full_name": user.get("full_name"),
+                    "email": user["email"],
+                    "is_online": user["is_online"],
+                    "last_seen": user["last_seen"].isoformat() if user["last_seen"] else None,
+                    "avatar": user.get("avatar")
+                }
+                filtered_users.append(user_data)
+        
+        return {"users": filtered_users}
+        
+    except Exception as e:
+        print(f"Error in get_chat_users: {str(e)}")
+        raise HTTPException(status_code=500, detail="Failed to fetch chat users")
+
+@app.get("/chat/messages/{user_id}")
+async def get_chat_messages(
+    user_id: str,
+    current_user: User = Depends(get_current_active_user),
+    page: int = 1,
+    limit: int = 50
+):
+    """Get messages between current user and specified user"""
+    try:
+        if not ObjectId.is_valid(user_id):
+            raise HTTPException(status_code=400, detail="Invalid user ID")
+        
+        # Calculate skip for pagination
+        skip = (page - 1) * limit
+        
+        # Get messages between the two users
+        query = {
+            "$or": [
+                {"sender_id": ObjectId(current_user.id), "receiver_id": ObjectId(user_id)},
+                {"sender_id": ObjectId(user_id), "receiver_id": ObjectId(current_user.id)}
+            ]
+        }
+        
+        # Get messages sorted by creation time
+        messages = await db.messages.find(query).sort("created_at", 1).skip(skip).limit(limit).to_list(limit)
+        
+        # Get user details for sender and receiver names
+        user_details = {}
+        for message in messages:
+            sender_id = str(message["sender_id"])
+            receiver_id = str(message["receiver_id"])
+            
+            if sender_id not in user_details:
+                sender = await db.users.find_one({"_id": message["sender_id"]})
+                if sender:
+                    user_details[sender_id] = sender
+            
+            if receiver_id not in user_details:
+                receiver = await db.users.find_one({"_id": message["receiver_id"]})
+                if receiver:
+                    user_details[receiver_id] = receiver
+        
+        # Enrich messages with user names
+        enriched_messages = []
+        for message in messages:
+            sender_id = str(message["sender_id"])
+            receiver_id = str(message["receiver_id"])
+            
+            sender = user_details.get(sender_id, {})
+            receiver = user_details.get(receiver_id, {})
+            
+            enriched_message = {
+                "id": str(message["_id"]),
+                "sender_id": sender_id,
+                "receiver_id": receiver_id,
+                "content": message["content"],
+                "created_at": message["created_at"].isoformat(),
+                "read_at": message["read_at"].isoformat() if message.get("read_at") else None,
+                "sender_name": sender.get("username", "Unknown"),
+                "receiver_name": receiver.get("username", "Unknown")
+            }
+            
+            enriched_messages.append(enriched_message)
+        
+        return {
+            "messages": enriched_messages,
+            "total": len(enriched_messages),
+            "page": page,
+            "limit": limit
+        }
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        print(f"Error fetching messages: {str(e)}")
+        raise HTTPException(status_code=500, detail="Failed to fetch messages")
+
+@app.post("/chat/messages", response_model=Message)
+async def send_message(
+    message_data: MessageBase,
+    current_user: User = Depends(get_current_active_user)
+):
+    """Send a message to another user"""
+    try:
+        if not ObjectId.is_valid(message_data.receiver_id):
+            raise HTTPException(status_code=400, detail="Invalid receiver ID")
+        
+        if not message_data.content.strip():
+            raise HTTPException(status_code=400, detail="Message content cannot be empty")
+        
+        # Check if receiver exists
+        receiver = await db.users.find_one({"_id": ObjectId(message_data.receiver_id)})
+        if not receiver:
+            raise HTTPException(status_code=404, detail="Receiver not found")
+        
+        # Create message document
+        message_dict = {
+            "sender_id": ObjectId(current_user.id),
+            "receiver_id": ObjectId(message_data.receiver_id),
+            "content": message_data.content.strip(),
+            "created_at": datetime.utcnow(),
+            "read_at": None
+        }
+        
+        # Insert message
+        result = await db.messages.insert_one(message_dict)
+        
+        # Get the created message with user details
+        created_message = await db.messages.find_one({"_id": result.inserted_id})
+        
+        # Enrich with user names
+        sender = await db.users.find_one({"_id": created_message["sender_id"]})
+        receiver = await db.users.find_one({"_id": created_message["receiver_id"]})
+        
+        enriched_message = {
+            "id": str(created_message["_id"]),
+            "sender_id": str(created_message["sender_id"]),
+            "receiver_id": str(created_message["receiver_id"]),
+            "content": created_message["content"],
+            "created_at": created_message["created_at"].isoformat(),
+            "read_at": None,
+            "sender_name": sender.get("username", "Unknown") if sender else "Unknown",
+            "receiver_name": receiver.get("username", "Unknown") if receiver else "Unknown"
+        }
+        
+        return enriched_message
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        print(f"Error sending message: {str(e)}")
+        raise HTTPException(status_code=500, detail="Failed to send message")
+
+@app.put("/chat/messages/read/{user_id}")
+async def mark_messages_as_read(
+    user_id: str,
+    current_user: User = Depends(get_current_active_user)
+):
+    """Mark all messages from a specific user as read"""
+    try:
+        if not ObjectId.is_valid(user_id):
+            raise HTTPException(status_code=400, detail="Invalid user ID")
+        
+        # Mark all unread messages from the specified user as read
+        result = await db.messages.update_many(
+            {
+                "sender_id": ObjectId(user_id),
+                "receiver_id": ObjectId(current_user.id),
+                "read_at": None
+            },
+            {
+                "$set": {"read_at": datetime.utcnow()}
+            }
+        )
+        
+        return {
+            "message": "Messages marked as read",
+            "updated_count": result.modified_count
+        }
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        print(f"Error marking messages as read: {str(e)}")
+        raise HTTPException(status_code=500, detail="Failed to mark messages as read")
+
+@app.get("/chat/unread-count")
+async def get_unread_message_count(current_user: User = Depends(get_current_active_user)):
+    """Get total unread message count for current user"""
+    try:
+        unread_count = await db.messages.count_documents({
+            "receiver_id": ObjectId(current_user.id),
+            "read_at": None
+        })
+        
+        return {"unread_count": unread_count}
+        
+    except Exception as e:
+        print(f"Error getting unread count: {str(e)}")
+        raise HTTPException(status_code=500, detail="Failed to get unread count")
+
+@app.get("/chat/online-users")
+async def get_online_users(current_user: User = Depends(get_current_active_user)):
+    """Get list of currently online users"""
+    try:
+        chat_users = await get_chat_users_with_status()
+        online_users = [user for user in chat_users if user["is_online"]]
+        
+        return {"online_users": online_users}
+        
+    except Exception as e:
+        print(f"Error getting online users: {str(e)}")
+        raise HTTPException(status_code=500, detail="Failed to get online users")
+
+@app.put("/chat/status")
+async def update_user_status(
+    status_data: UserStatus,
+    current_user: User = Depends(get_current_active_user)
+):
+    """Update user's online status and last seen time"""
+    try:
+        update_data = {
+            "last_seen": status_data.last_seen or datetime.utcnow()
+        }
+        
+        # Update user's last seen time
+        result = await db.users.update_one(
+            {"_id": ObjectId(current_user.id)},
+            {"$set": update_data}
+        )
+        
+        if result.modified_count == 0:
+            raise HTTPException(status_code=404, detail="User not found")
+        
+        return {
+            "message": "Status updated successfully",
+            "is_online": status_data.is_online,
+            "last_seen": update_data["last_seen"].isoformat()
+        }
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        print(f"Error updating user status: {str(e)}")
+        raise HTTPException(status_code=500, detail="Failed to update status")
+
+@app.get("/chat/conversations")
+async def get_user_conversations(current_user: User = Depends(get_current_active_user)):
+    """Get list of users current user has conversations with, sorted by latest message"""
+    try:
+        # Aggregate to find all users the current user has exchanged messages with
+        pipeline = [
+            {
+                "$match": {
+                    "$or": [
+                        {"sender_id": ObjectId(current_user.id)},
+                        {"receiver_id": ObjectId(current_user.id)}
+                    ]
+                }
+            },
+            {
+                "$addFields": {
+                    "other_user_id": {
+                        "$cond": {
+                            "if": {"$eq": ["$sender_id", ObjectId(current_user.id)]},
+                            "then": "$receiver_id",
+                            "else": "$sender_id"
+                        }
+                    }
+                }
+            },
+            {
+                "$group": {
+                    "_id": "$other_user_id",
+                    "latest_message": {"$last": "$$ROOT"},
+                    "unread_count": {
+                        "$sum": {
+                            "$cond": [
+                                {
+                                    "$and": [
+                                        {"$eq": ["$receiver_id", ObjectId(current_user.id)]},
+                                        {"$eq": ["$read_at", None]}
+                                    ]
+                                },
+                                1,
+                                0
+                            ]
+                        }
+                    }
+                }
+            },
+            {
+                "$sort": {"latest_message.created_at": -1}
+            }
+        ]
+        
+        conversations_data = await db.messages.aggregate(pipeline).to_list(100)
+        
+        # Enrich with user details
+        conversations = []
+        for conv in conversations_data:
+            user_id = conv["_id"]
+            user = await db.users.find_one({"_id": user_id})
+            
+            if user:
+                latest_msg = conv["latest_message"]
+                
+                conversation = {
+                    "user_id": str(user_id),
+                    "username": user.get("username"),
+                    "full_name": user.get("full_name"),
+                    "email": user.get("email"),
+                    "is_online": False,  # Will be updated by frontend
+                    "latest_message": {
+                        "id": str(latest_msg["_id"]),
+                        "content": latest_msg["content"],
+                        "sender_id": str(latest_msg["sender_id"]),
+                        "created_at": latest_msg["created_at"].isoformat(),
+                        "is_sent_by_me": str(latest_msg["sender_id"]) == current_user.id
+                    },
+                    "unread_count": conv["unread_count"]
+                }
+                
+                conversations.append(conversation)
+        
+        return {"conversations": conversations}
+        
+    except Exception as e:
+        print(f"Error getting conversations: {str(e)}")
+        raise HTTPException(status_code=500, detail="Failed to get conversations")
 
 # Run with: uvicorn main:app --reload
 

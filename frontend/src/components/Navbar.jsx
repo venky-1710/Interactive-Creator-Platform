@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Trophy, User, LogOut, Settings, Menu, X, Home } from 'lucide-react';
+import { Trophy, User, LogOut, Settings, Menu, X, Home, MessageCircle } from 'lucide-react';
 import { useAuth } from '../hooks/useAuth';
 import './navbar.css';
 
@@ -71,6 +71,12 @@ const Navbar = () => {
               <Trophy className="icon" />
               <span>Leaderboard</span>
             </Link>
+            {user && (
+              <Link to="/chat" className="nav-link">
+                <MessageCircle className="icon" />
+                <span>Chat</span>
+              </Link>
+            )}
             {isAdmin && (
               <Link to="/admin" className="nav-link admin-link">
                 <Settings className="icon" />
@@ -154,6 +160,12 @@ const Navbar = () => {
             <Trophy className="mobile-nav-icon" />
             <span>Leaderboard</span>
           </Link>
+          {user && (
+            <Link to="/chat" className="mobile-nav-link" onClick={closeMobileMenu}>
+              <MessageCircle className="mobile-nav-icon" />
+              <span>Chat</span>
+            </Link>
+          )}
           {isAdmin && (
             <Link to="/admin" className="mobile-nav-link admin-mobile-link" onClick={closeMobileMenu}>
               <Settings className="mobile-nav-icon" />

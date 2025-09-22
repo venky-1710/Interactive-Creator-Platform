@@ -15,6 +15,7 @@ import PrivacyPolicy from './pages/PrivacyPolicy';
 import TermsOfService from './pages/TermsOfService';
 import ContactUs from './pages/ContactUs';
 import CalendarDemo from './pages/CalendarDemo';
+import ChatPage from './pages/ChatPage';
 import AdminLayout from './components/admin/AdminLayout';
 import AdminDashboardMain from './pages/admin/AdminDashboardMain';
 import AdminUsers from './pages/admin/AdminUsers';
@@ -44,6 +45,7 @@ function App() {
             <Route path="/challenges/:id" element={<ChallengeDetails />} />
             <Route path="/leaderboard" element={<Leaderboard />} />
             <Route path="/profile" element={isAuthenticated ? <Profile /> : <Navigate to="/login" />} />
+            <Route path="/chat" element={isAuthenticated ? <ChatPage /> : <Navigate to="/login" />} />
             <Route path="/privacy" element={<PrivacyPolicy />} />
             <Route path="/terms" element={<TermsOfService />} />
             <Route path="/contact" element={<ContactUs />} />

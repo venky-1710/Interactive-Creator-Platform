@@ -726,7 +726,7 @@
   
   :root {
     --card-width: 350px;
-    --card-height: 400px;
+    --card-height: 350px;
   }
   
   .calendar {
